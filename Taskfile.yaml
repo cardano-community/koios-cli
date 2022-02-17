@@ -8,7 +8,7 @@ tasks:
 
   build-snapshot:
     desc: |
-      Build snapshot binaries to ./cmd/koios-rest/dist.
+      Build snapshot binaries to ./dist directory.
     cmds:
       - goreleaser release --snapshot --rm-dist
 

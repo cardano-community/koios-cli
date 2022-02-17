@@ -216,7 +216,7 @@ koios-cli --enable-req-stats --host testnet.koios.rest tip
 
 ## Install
 
-It's highly recommended installing a latest version of koios-rest available on the [releases page](https://github.com/cardano-community/koios-cli/releases/latest).
+It's highly recommended installing a latest version of `koios-cli` available on the [releases page](https://github.com/cardano-community/koios-cli/releases/latest).
 
 ## Install from Source
 
@@ -224,9 +224,9 @@ It's highly recommended installing a latest version of koios-rest available on t
 go install github.com/cardano-community/koios-cli@latest
 ```
 
-verify installation
+**verify installation**
 
-`koios-rest --version`
+`koios-cli --version`
 
 
 ## Contributing

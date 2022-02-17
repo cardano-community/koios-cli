@@ -76,9 +76,9 @@ before:
 nfpms:
   -
     id: koios-cli-nfpms
-    package_name: koios-rest
+    package_name: koios-cli
     file_name_template: "{{ .ConventionalFileName }}"
-    homepage: https://github.com/howijd/koios-rest-go-client
+    homepage: https://github.com/cardano-community/koios-cli
     maintainer: "The Cardano Community Authors <cardano-community@users.noreply.github.com>"
     description: Koios CLI
     vendor: Cardano Community
