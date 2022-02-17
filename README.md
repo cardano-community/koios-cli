@@ -24,8 +24,8 @@
   - [List of API commands](#list-of-api-commands)
   - [Example Usage](#example-usage)
     - [Example to query testnet tip from cli](#example-to-query-testnet-tip-from-cli)
-  - [Install](#install)
-    - [Install from Source](#install-from-source)
+- [Install](#install)
+- [Install from Source](#install-from-source)
 - [Contributing](#contributing)
   - [Code of Conduct](#code-of-conduct)
   - [Got a Question or Problem?](#got-a-question-or-problem)
@@ -214,11 +214,11 @@ koios-cli --enable-req-stats --host testnet.koios.rest tip
 }
 ```
 
-### Install
+## Install
 
 It's highly recommended installing a latest version of koios-rest available on the [releases page](https://github.com/cardano-community/koios-cli/releases/latest).
 
-#### Install from Source
+## Install from Source
 
 ```shell
 go install github.com/cardano-community/koios-cli@latest
