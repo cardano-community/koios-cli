@@ -36,12 +36,13 @@ var (
 
 	// Populated by goreleaser during build.
 	version    = "dev"
+	date       = ""
 	ErrCommand = errors.New("command error")
 )
 
 //nolint:gochecknoinits
 func init() {
-	if info, available := debug.ReadBuildInfo(); available && version == "dev" {
+	if info, available := debug.ReadBuildInfo(); available && version == "dev" && date == "" {
 		version = info.Main.Version
 	}
 }
