@@ -72,8 +72,6 @@ changelog:
 before:
   hooks:
     - go mod tidy
-    - cp ../../README.md README.md
-    - cp ../../LICENSE LICENSE
 
 nfpms:
   -
