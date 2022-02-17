@@ -1,0 +1,91 @@
+project_name: koios-cli
+
+release:
+  draft: true
+  github:
+    owner: cardano-community
+    name: koios-cli
+
+builds:
+  - binary: koios-cli
+    goos:
+      - darwin
+      - windows
+      - linux
+      - freebsd
+    goarch:
+      - "386"
+      - amd64
+      - arm
+      - arm64
+    goarm:
+      - "7"
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    env:
+      - CGO_ENABLED=0
+    ignore:
+      - goos: darwin
+        goarch: 386
+      - goos: freebsd
+        goarch: arm64
+    main: ./
+    ldflags: -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.Date}}
+    flags:
+      - -trimpath
+archives:
+  - format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    files:
+      - LICENSE
+      - README.md
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+
+universal_binaries:
+- replace: false
+
+snapshot:
+  name_template: SNAPSHOT-{{ .Commit }}
+
+checksum:
+  name_template: '{{ .ProjectName }}-{{ .Version }}-checksums.txt'
+
+changelog:
+  sort: desc
+  filters:
+    exclude:
+    - '^.github:'
+    - '^test:'
+    - 'README'
+    - 'build\(deps\): bump .* in /docs \(#\d+\)'
+    - Merge pull request
+    - Merge branch
+    - Merge remote-tracking branch
+
+before:
+  hooks:
+    - go mod tidy
+    - cp ../../README.md README.md
+    - cp ../../LICENSE LICENSE
+
+nfpms:
+  -
+    id: koios-cli-nfpms
+    package_name: koios-rest
+    file_name_template: "{{ .ConventionalFileName }}"
+    homepage: https://github.com/howijd/koios-rest-go-client
+    maintainer: "The Cardano Community Authors <cardano-community@users.noreply.github.com>"
+    description: Koios CLI
+    vendor: Cardano Community
+    license: Apache 2.0
+    formats:
+      - apk
+      - deb
+      - rpm
