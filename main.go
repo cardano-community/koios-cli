@@ -46,6 +46,7 @@ func init() {
 	}
 }
 
+// application main
 func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
@@ -68,10 +69,10 @@ func main() {
 	}
 
 	attachAPICommmand(app)
-
 	handleErr(app.Run(os.Args))
 }
 
+// common error handler
 func handleErr(err error) {
 	if err == nil {
 		return
@@ -85,6 +86,7 @@ func handleErr(err error) {
 	log.Fatal(err)
 }
 
+// helper to print json response body
 func printResponseBody(ctx *cli.Context, body []byte) {
 	if ctx.Bool("no-format") {
 		fmt.Println(string(body))
@@ -95,7 +97,8 @@ func printResponseBody(ctx *cli.Context, body []byte) {
 	fmt.Println(string(out))
 }
 
-func output(ctx *cli.Context, data interface{}, err error) {
+// output koios api client responses
+func apiOutput(ctx *cli.Context, data interface{}, err error) {
 	handleErr(err)
 
 	if ctx.Bool("no-format") {

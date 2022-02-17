@@ -124,7 +124,7 @@ func attachAPIAccountCommmands(apicmd *cli.Command, api *koios.Client) {
 			Usage:    "Get a list of all accounts returns array of stake addresses.",
 			Action: func(ctx *cli.Context) error {
 				res, err := api.GetAccountList(callctx)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -138,7 +138,7 @@ func attachAPIAccountCommmands(apicmd *cli.Command, api *koios.Client) {
 					return fmt.Errorf("%w: %s", ErrCommand, "account-info requires single address")
 				}
 				res, err := api.GetAccountInfo(callctx, koios.Address(ctx.Args().Get(0)))
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -164,7 +164,7 @@ func attachAPIAccountCommmands(apicmd *cli.Command, api *koios.Client) {
 					epoch = &v
 				}
 				res, err := api.GetAccountRewards(callctx, koios.StakeAddress(ctx.Args().Get(0)), epoch)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -178,7 +178,7 @@ func attachAPIAccountCommmands(apicmd *cli.Command, api *koios.Client) {
 					return fmt.Errorf("%w: %s", ErrCommand, "account-updates requires single stake address")
 				}
 				res, err := api.GetAccountUpdates(callctx, koios.StakeAddress(ctx.Args().Get(0)))
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -192,7 +192,7 @@ func attachAPIAccountCommmands(apicmd *cli.Command, api *koios.Client) {
 					return fmt.Errorf("%w: %s", ErrCommand, "account-updates requires single stake or payment address")
 				}
 				res, err := api.GetAccountAddresses(callctx, koios.StakeAddress(ctx.Args().Get(0)))
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -206,7 +206,7 @@ func attachAPIAccountCommmands(apicmd *cli.Command, api *koios.Client) {
 					return fmt.Errorf("%w: %s", ErrCommand, "account-updates requires single stake or payment address")
 				}
 				res, err := api.GetAccountAssets(callctx, koios.StakeAddress(ctx.Args().Get(0)))
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -219,7 +219,7 @@ func attachAPIAccountCommmands(apicmd *cli.Command, api *koios.Client) {
 					return fmt.Errorf("%w: %s", ErrCommand, "account-history requires single stake or payment address")
 				}
 				res, err := api.GetAccountHistory(callctx, koios.StakeAddress(ctx.Args().Get(0)))
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -238,7 +238,7 @@ func attachAPIAddressCommmands(apicmd *cli.Command, api *koios.Client) {
 					return fmt.Errorf("%w: %s", ErrCommand, "address-info requires single address")
 				}
 				res, err := api.GetAddressInfo(callctx, koios.Address(ctx.Args().Get(0)))
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -262,7 +262,7 @@ func attachAPIAddressCommmands(apicmd *cli.Command, api *koios.Client) {
 				}
 
 				res, err := api.GetAddressTxs(callctx, addresses, ctx.Uint64("after-block-height"))
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -276,7 +276,7 @@ func attachAPIAddressCommmands(apicmd *cli.Command, api *koios.Client) {
 					return fmt.Errorf("%w: %s", ErrCommand, "address-info requires single address")
 				}
 				res, err := api.GetAddressAssets(callctx, koios.Address(ctx.Args().Get(0)))
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -300,7 +300,7 @@ func attachAPIAddressCommmands(apicmd *cli.Command, api *koios.Client) {
 				}
 
 				res, err := api.GetCredentialTxs(callctx, credentials, ctx.Uint64("after-block-height"))
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -315,7 +315,7 @@ func attachAPIAssetsCommmands(apicmd *cli.Command, api *koios.Client) {
 			Usage:    "Get the list of all native assets (paginated).",
 			Action: func(ctx *cli.Context) error {
 				res, err := api.GetAssetList(callctx)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -341,7 +341,7 @@ func attachAPIAssetsCommmands(apicmd *cli.Command, api *koios.Client) {
 					koios.PolicyID(ctx.String("policy")),
 					koios.AssetName(ctx.String("name")),
 				)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -367,7 +367,7 @@ func attachAPIAssetsCommmands(apicmd *cli.Command, api *koios.Client) {
 					koios.PolicyID(ctx.String("policy")),
 					koios.AssetName(ctx.String("name")),
 				)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -394,7 +394,7 @@ func attachAPIAssetsCommmands(apicmd *cli.Command, api *koios.Client) {
 					koios.PolicyID(ctx.String("policy")),
 					koios.AssetName(ctx.String("name")),
 				)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -420,7 +420,7 @@ func attachAPIAssetsCommmands(apicmd *cli.Command, api *koios.Client) {
 					koios.PolicyID(ctx.String("policy")),
 					koios.AssetName(ctx.String("name")),
 				)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -435,7 +435,7 @@ func attachAPIBlocksCommmands(apicmd *cli.Command, api *koios.Client) {
 			Usage:    "Get summarised details about all blocks (paginated - latest first).",
 			Action: func(ctx *cli.Context) error {
 				res, err := api.GetBlocks(callctx)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -455,7 +455,7 @@ func attachAPIBlocksCommmands(apicmd *cli.Command, api *koios.Client) {
 					callctx,
 					koios.BlockHash(ctx.String("block-hash")),
 				)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -475,7 +475,7 @@ func attachAPIBlocksCommmands(apicmd *cli.Command, api *koios.Client) {
 					callctx,
 					koios.BlockHash(ctx.String("block-hash")),
 				)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -503,7 +503,7 @@ func attachAPIEpochCommmands(apicmd *cli.Command, api *koios.Client) {
 				}
 
 				res, err := api.GetEpochInfo(callctx, epoch)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -527,7 +527,7 @@ func attachAPIEpochCommmands(apicmd *cli.Command, api *koios.Client) {
 				}
 
 				res, err := api.GetEpochParams(callctx, epoch)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -584,7 +584,7 @@ func attachAPINetworkCommmands(apicmd *cli.Command, api *koios.Client) {
 			Usage:    "Get the tip info about the latest block seen by chain.",
 			Action: func(ctx *cli.Context) error {
 				res, err := api.GetTip(callctx)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -594,7 +594,7 @@ func attachAPINetworkCommmands(apicmd *cli.Command, api *koios.Client) {
 			Usage:    "Get the Genesis parameters used to start specific era on chain.",
 			Action: func(ctx *cli.Context) error {
 				res, err := api.GetGenesis(callctx)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -617,7 +617,7 @@ func attachAPINetworkCommmands(apicmd *cli.Command, api *koios.Client) {
 				}
 
 				res, err := api.GetTotals(callctx, epoch)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -632,7 +632,7 @@ func attachAPIScriptCommmands(apicmd *cli.Command, api *koios.Client) {
 			Usage:    "List of all existing script hashes along with their creation transaction hashes.",
 			Action: func(ctx *cli.Context) error {
 				res, err := api.GetScriptList(callctx)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -646,7 +646,7 @@ func attachAPIScriptCommmands(apicmd *cli.Command, api *koios.Client) {
 					return fmt.Errorf("%w: %s", ErrCommand, "script-redeemers requires single script-hash as arg")
 				}
 				res, err := api.GetScriptRedeemers(callctx, koios.ScriptHash(ctx.Args().Get(0)))
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -666,7 +666,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command, api *koios.Client) {
 					txs = append(txs, koios.TxHash(a))
 				}
 				res, err := api.GetTxsInfos(callctx, txs)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -680,14 +680,14 @@ func attachAPITransactionsCommmands(apicmd *cli.Command, api *koios.Client) {
 					return fmt.Errorf("%w: %s", ErrCommand, "tx-info requires single transaction hash")
 				}
 				res, err := api.GetTxInfo(callctx, koios.TxHash(ctx.Args().Get(0)))
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
 			Name:      "tx-utxos",
 			Category:  "TRANSACTIONS",
-			Usage:     "Get UTxO set (inputs/outputs) of transactions.",
+			Usage:     "Get UTxO set (inputs/apiOutputs) of transactions.",
 			ArgsUsage: "[tx-hashes...]",
 			Action: func(ctx *cli.Context) error {
 				var txs []koios.TxHash
@@ -695,7 +695,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command, api *koios.Client) {
 					txs = append(txs, koios.TxHash(a))
 				}
 				res, err := api.GetTxsUTxOs(callctx, txs)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -710,7 +710,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command, api *koios.Client) {
 					txs = append(txs, koios.TxHash(a))
 				}
 				res, err := api.GetTxsMetadata(callctx, txs)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -724,7 +724,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command, api *koios.Client) {
 					return fmt.Errorf("%w: %s", ErrCommand, "tx-metadata requires single transaction hash")
 				}
 				res, err := api.GetTxMetadata(callctx, koios.TxHash(ctx.Args().Get(0)))
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -734,7 +734,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command, api *koios.Client) {
 			Usage:    "Get a list of all transaction metalabels.",
 			Action: func(ctx *cli.Context) error {
 				res, err := api.GetTxMetaLabels(callctx)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -758,7 +758,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command, api *koios.Client) {
 					return err
 				}
 				res, err := api.SubmitSignedTx(callctx, stx)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -773,7 +773,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command, api *koios.Client) {
 					txs = append(txs, koios.TxHash(a))
 				}
 				res, err := api.GetTxsStatuses(callctx, txs)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -787,7 +787,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command, api *koios.Client) {
 					return fmt.Errorf("%w: %s", ErrCommand, "tx-status requires single transaction hash")
 				}
 				res, err := api.GetTxStatus(callctx, koios.TxHash(ctx.Args().Get(0)))
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -802,7 +802,7 @@ func attachAPIPoolCommmands(apicmd *cli.Command, api *koios.Client) {
 			Usage:    "A list of all currently registered/retiring (not retired) pools.",
 			Action: func(ctx *cli.Context) error {
 				res, err := api.GetPoolList(callctx)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -817,7 +817,7 @@ func attachAPIPoolCommmands(apicmd *cli.Command, api *koios.Client) {
 					pids = append(pids, koios.PoolID(pid))
 				}
 				res, err := api.GetPoolInfos(callctx, pids)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -831,7 +831,7 @@ func attachAPIPoolCommmands(apicmd *cli.Command, api *koios.Client) {
 					return fmt.Errorf("%w: %s", ErrCommand, "pool-info requires single pool id")
 				}
 				res, err := api.GetPoolInfo(callctx, koios.PoolID(ctx.Args().Get(0)))
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -857,7 +857,7 @@ func attachAPIPoolCommmands(apicmd *cli.Command, api *koios.Client) {
 				}
 
 				res, err := api.GetPoolDelegators(callctx, koios.PoolID(ctx.Args().Get(0)), epoch)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -883,7 +883,7 @@ func attachAPIPoolCommmands(apicmd *cli.Command, api *koios.Client) {
 				}
 
 				res, err := api.GetPoolBlocks(callctx, koios.PoolID(ctx.Args().Get(0)), epoch)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -899,7 +899,7 @@ func attachAPIPoolCommmands(apicmd *cli.Command, api *koios.Client) {
 				}
 
 				res, err := api.GetPoolUpdates(callctx, pool)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -909,7 +909,7 @@ func attachAPIPoolCommmands(apicmd *cli.Command, api *koios.Client) {
 			Usage:    "A list of registered relays for all currently registered/retiring (not retired) pools.",
 			Action: func(ctx *cli.Context) error {
 				res, err := api.GetPoolRelays(callctx)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
@@ -919,7 +919,7 @@ func attachAPIPoolCommmands(apicmd *cli.Command, api *koios.Client) {
 			Usage:    "Metadata(on & off-chain) for all currently registered/retiring (not retired) pools.",
 			Action: func(ctx *cli.Context) error {
 				res, err := api.GetPoolMetadata(callctx)
-				output(ctx, res, err)
+				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
