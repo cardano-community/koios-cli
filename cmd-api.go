@@ -749,7 +749,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command, api *koios.Client) {
 
 				stx := koios.TxBodyJSON{}
 
-				txfile, err := io.ReadFile(ctx.Args().Get(0))
+				txfile, err := ioutil.ReadFile(ctx.Args().Get(0))
 				if err != nil {
 					return err
 				}
