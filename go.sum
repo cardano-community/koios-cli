@@ -1,6 +1,6 @@
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/cardano-community/koios-go-client v0.2.2 h1:GdGFw7LFDeegHIpRUIgPDZM9M2zfeqOTXY5Q0x6Y61Y=
-github.com/cardano-community/koios-go-client v0.2.2/go.mod h1:obNmjKH4vVCnwsYXExTOw6IIDqZi+0vABWxIiaF4kdA=
+github.com/cardano-community/koios-go-client v0.2.3 h1:5IXqYosFAciDuOv2DwccJnEDKsI7KxHgG2oZ0dl72Xc=
+github.com/cardano-community/koios-go-client v0.2.3/go.mod h1:obNmjKH4vVCnwsYXExTOw6IIDqZi+0vABWxIiaF4kdA=
 github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d h1:U+s90UTSYgptZMwQh2aRr3LuazLJIa+Pg3Kc1ylSYVY=
 github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsrgA7czyZG/E6dU=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
