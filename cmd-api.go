@@ -19,7 +19,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
+	"os"
 
 	"github.com/urfave/cli/v2"
 
@@ -548,7 +549,7 @@ func attachAPIGeneralCommmands(apicmd *cli.Command, api *koios.Client) {
 				res, err := api.GET(callctx, endpoint, nil, nil)
 				handleErr(err)
 				defer res.Body.Close()
-				body, err := ioutil.ReadAll(res.Body)
+				body, err := io.ReadAll(res.Body)
 				handleErr(err)
 				printResponseBody(ctx, body)
 				return nil
@@ -749,7 +750,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command, api *koios.Client) {
 
 				stx := koios.TxBodyJSON{}
 
-				txfile, err := ioutil.ReadFile(ctx.Args().Get(0))
+				txfile, err := os.ReadFile(ctx.Args().Get(0))
 				if err != nil {
 					return err
 				}
