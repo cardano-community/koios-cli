@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 
 	"github.com/urfave/cli/v2"
@@ -542,11 +543,15 @@ func attachAPIGeneralCommmands(apicmd *cli.Command, api *koios.Client) {
 			Usage:    "get issues a GET request to the specified API endpoint",
 			Category: "UTILS",
 			Action: func(ctx *cli.Context) error {
-				endpoint := ctx.Args().Get(0)
-				if len(endpoint) == 0 {
+				uri := ctx.Args().Get(0)
+				if len(uri) == 0 {
 					return fmt.Errorf("%w: %s", ErrCommand, "provide endpoint as argument e.g. /tip")
 				}
-				res, err := api.GET(callctx, endpoint, nil, nil)
+
+				u, err := url.ParseRequestURI(uri)
+				handleErr(err)
+
+				res, err := api.GET(callctx, u.Path, u.Query(), nil)
 				handleErr(err)
 				defer res.Body.Close()
 				body, err := io.ReadAll(res.Body)
@@ -561,11 +566,14 @@ func attachAPIGeneralCommmands(apicmd *cli.Command, api *koios.Client) {
 			Usage:    "head issues a HEAD request to the specified API endpoint",
 			Category: "UTILS",
 			Action: func(ctx *cli.Context) error {
-				endpoint := ctx.Args().Get(0)
-				if ctx.NArg() == 0 || len(endpoint) == 0 {
+				uri := ctx.Args().Get(0)
+				if ctx.NArg() == 0 || len(uri) == 0 {
 					return fmt.Errorf("%w: %s", ErrCommand, "provide endpoint as argument e.g. /tip")
 				}
-				res, err := api.HEAD(callctx, endpoint, nil, nil)
+				u, err := url.ParseRequestURI(uri)
+				handleErr(err)
+
+				res, err := api.HEAD(callctx, u.Path, u.Query(), nil)
 				handleErr(err)
 				if res.Body != nil {
 					res.Body.Close()
