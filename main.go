@@ -17,6 +17,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -88,14 +89,14 @@ func handleErr(err error) {
 }
 
 // helper to print json response body.
-func printResponseBody(ctx *cli.Context, body []byte) {
+func printJSON(ctx *cli.Context, body []byte) {
 	if ctx.Bool("no-format") {
 		fmt.Println(string(body))
 		return
 	}
-	out, err := json.MarshalIndent(body, "", " ")
-	handleErr(err)
-	fmt.Println(string(out))
+	var pretty bytes.Buffer
+	handleErr(json.Indent(&pretty, body, "", "    "))
+	fmt.Println(pretty.String())
 }
 
 // output koios api client responses.

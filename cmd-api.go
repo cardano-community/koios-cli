@@ -551,7 +551,8 @@ func attachAPIGeneralCommmands(apicmd *cli.Command, api *koios.Client) {
 				defer res.Body.Close()
 				body, err := io.ReadAll(res.Body)
 				handleErr(err)
-				printResponseBody(ctx, body)
+
+				printJSON(ctx, body)
 				return nil
 			},
 		},
