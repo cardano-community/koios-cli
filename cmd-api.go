@@ -28,9 +28,6 @@ import (
 	"github.com/cardano-community/koios-go-client"
 )
 
-//nolint: gochecknoglobals
-var api *koios.Client
-
 func attachAPICommmand(app *cli.App) {
 	apicmd := &cli.Command{
 		Name:     "api",

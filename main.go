@@ -28,17 +28,23 @@ import (
 	"runtime/debug"
 
 	"github.com/urfave/cli/v2"
+
+	"github.com/cardano-community/koios-go-client"
 )
 
 //nolint: gochecknoglobals
 var (
+	ErrCommand = errors.New("command error")
+
 	callctx context.Context
 	cancel  context.CancelFunc
 
 	// Populated by goreleaser during build.
-	version    = "dev"
-	date       = ""
-	ErrCommand = errors.New("command error")
+	version = "dev"
+	date    = ""
+
+	//nolint: gochecknoglobals
+	api *koios.Client
 )
 
 //nolint:gochecknoinits
@@ -71,6 +77,7 @@ func main() {
 	}
 
 	attachAPICommmand(app)
+	attachHealthcheckCommmand(app)
 	handleErr(app.Run(os.Args))
 }
 
