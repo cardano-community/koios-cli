@@ -80,11 +80,11 @@ func handleErr(err error) {
 		return
 	}
 	cancel()
-	trace := err
-	for errors.Unwrap(trace) != nil {
-		trace = errors.Unwrap(trace)
-		log.Println(trace)
-	}
+	// trace := err
+	// for errors.Unwrap(trace) != nil {
+	// 	trace = errors.Unwrap(trace)
+	// 	log.Println(trace)
+	// }
 	log.Fatal(err)
 }
 

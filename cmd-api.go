@@ -893,6 +893,32 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 			},
 		},
 		{
+			Name:     "pool-history",
+			Category: "POOL",
+			Usage:    "Return information about delegators by a given pool and optional epoch (current if omitted).",
+			Flags: []cli.Flag{
+				&cli.Uint64Flag{
+					Name:  "epoch",
+					Usage: "Epoch Number to fetch details for",
+					Value: uint64(0),
+				},
+			},
+			Action: func(ctx *cli.Context) error {
+				if ctx.NArg() != 1 {
+					return fmt.Errorf("%w: %s", ErrCommand, "pool-delegators requires single pool id")
+				}
+				var epoch *koios.EpochNo
+				if ctx.Uint("epoch") > 0 {
+					v := koios.EpochNo(ctx.Uint64("epoch"))
+					epoch = &v
+				}
+
+				res, err := api.GetPoolHistory(callctx, koios.PoolID(ctx.Args().Get(0)), epoch)
+				apiOutput(ctx, res, err)
+				return nil
+			},
+		},
+		{
 			Name:     "pool-blocks",
 			Category: "POOL",
 			Usage:    "Return information about blocks minted by a given pool in current epoch (or _epoch_no if provided).",
