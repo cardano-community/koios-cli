@@ -22,6 +22,7 @@ import (
 	"io"
 	"net/url"
 	"os"
+	"strings"
 
 	"github.com/urfave/cli/v2"
 
@@ -585,7 +586,7 @@ func attachAPIGeneralCommmands(apicmd *cli.Command) {
 	apicmd.Subcommands = append(apicmd.Subcommands, []*cli.Command{
 		{
 			Name:     "get",
-			Usage:    "get issues a GET request to the specified API endpoint",
+			Usage:    "send GET request to the specified API endpoint",
 			Category: "UTILS",
 			Action: func(ctx *cli.Context) error {
 				uri := ctx.Args().Get(0)
@@ -597,6 +598,33 @@ func attachAPIGeneralCommmands(apicmd *cli.Command) {
 				handleErr(err)
 
 				res, err := api.GET(callctx, u.Path, u.Query(), nil)
+				handleErr(err)
+				defer res.Body.Close()
+				body, err := io.ReadAll(res.Body)
+				handleErr(err)
+
+				printJSON(ctx, body)
+				return nil
+			},
+		},
+		{
+			Name:     "post",
+			Usage:    "send POST request to the specified API endpoint",
+			Category: "UTILS",
+			Action: func(ctx *cli.Context) error {
+				uri := ctx.Args().Get(0)
+				pl := ctx.Args().Get(1)
+				if len(uri) == 0 {
+					return fmt.Errorf("%w: %s", ErrCommand, "provide endpoint as argument 1 e.g. /tip")
+				}
+				if len(pl) == 1 {
+					return fmt.Errorf("%w: %s", ErrCommand, "provide payload as argument 2")
+				}
+
+				u, err := url.ParseRequestURI(uri)
+				handleErr(err)
+
+				res, err := api.POST(callctx, u.Path, strings.NewReader(pl), u.Query(), nil)
 				handleErr(err)
 				defer res.Body.Close()
 				body, err := io.ReadAll(res.Body)
