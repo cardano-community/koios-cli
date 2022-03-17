@@ -49,9 +49,7 @@ type HealthcheckResponse struct {
 	} `json:"chk_rpcs"`
 	Cache     []HealthcheckResult `json:"chk_cache_status"`
 	Limit     *HealthcheckResult  `json:"chk_limit"`
-	Endpoints []struct {
-		Endpoint string `json:"endpoint"`
-	} `json:"chk_endpt_get"`
+	Endpoints []HealthcheckResult `json:"chk_endpt_get"`
 }
 
 type healthcheckTask struct {
@@ -143,36 +141,26 @@ func attachHealthcheckCommmand(app *cli.App) {
 			return err
 		},
 		Action: func(ctx *cli.Context) error {
+			res := &HealthcheckResponse{}
 			tasks := []healthcheckTask{
 				healthcheckCheckTip(),
-				healthcheckCheckRPC(),
 				healthcheckCheckCacheStatusESDL(),
 				healthcheckCheckCacheStatusEPHCLU(),
 				healthcheckCheckCacheStatusLASVE(),
 				healthcheckCheckLimit(),
-				healthcheckEndpointTxMetalabels(),
-				healthcheckEndpointEpochInfo(),
+				healthcheckEndpoints("/tx_metalabels"),
+				healthcheckCheckRPC(),
 			}
-
-			res := &HealthcheckResponse{}
 
 			for _, task := range tasks {
-				fail, msg := task.Do(ctx, res)
-				if fail {
-					if !ctx.Bool("quiet") {
-						if ctx.Bool("json") {
-							apiOutput(ctx, res, nil)
-						} else {
-							log.Println("[ERROR ]: ", task.Name, " - ", msg)
-						}
-					}
-					os.Exit(1)
-				}
-
-				if !ctx.Bool("quiet") && !ctx.Bool("json") {
-					log.Println("[  OK  ]: ", task.Name, " - ", msg)
-				}
+				performHealthcheckTask(ctx, task, res)
 			}
+
+			performHealthcheckTask(
+				ctx,
+				healthcheckEndpoints(fmt.Sprintf("/epoch_info?_epoch_no=%d", res.Tip.Data.EpochNo-1)),
+				res,
+			)
 
 			// Output if quiet flag is not present
 			if !ctx.Bool("quiet") && ctx.Bool("json") {
@@ -183,6 +171,24 @@ func attachHealthcheckCommmand(app *cli.App) {
 	}
 
 	app.Commands = append(app.Commands, hcmd)
+}
+
+func performHealthcheckTask(ctx *cli.Context, task healthcheckTask, res *HealthcheckResponse) {
+	fail, msg := task.Do(ctx, res)
+	if fail {
+		if !ctx.Bool("quiet") {
+			if ctx.Bool("json") {
+				apiOutput(ctx, res, nil)
+			} else {
+				log.Println("[ERROR ]: ", task.Name, " - ", msg)
+			}
+		}
+		os.Exit(1)
+	}
+
+	if !ctx.Bool("quiet") && !ctx.Bool("json") {
+		log.Println("[  OK  ]: ", task.Name, " - ", msg)
+	}
 }
 
 // CHECK TIP
@@ -229,15 +235,6 @@ func healthcheckCheckTip() healthcheckTask {
 				return false, fmt.Sprint("tip has expired - age ", res.Tip.LastBlockAgeStr)
 			}
 			return false, fmt.Sprint("tip age ", res.Tip.LastBlockAgeStr)
-		},
-	}
-}
-
-func healthcheckCheckRPC() healthcheckTask {
-	return healthcheckTask{
-		Name: "check-rpcs",
-		Do: func(ctx *cli.Context, res *HealthcheckResponse) (fail bool, msg string) {
-			return false, "not implemented"
 		},
 	}
 }
@@ -465,20 +462,59 @@ func healthcheckCheckLimit() healthcheckTask {
 	}
 }
 
-func healthcheckEndpointTxMetalabels() healthcheckTask {
+func healthcheckEndpoints(endpoint string) healthcheckTask {
+	e := fmt.Sprintf("check-endpoint(%s)", endpoint)
 	return healthcheckTask{
-		Name: "check-endpoint(tx_metalabels)",
+		Name: e,
 		Do: func(ctx *cli.Context, res *HealthcheckResponse) (fail bool, msg string) {
-			return false, "heck-endpoint(tx_metalabels) not implemented"
+			status := &HealthcheckResult{}
+			status.Task = e
+			status.Status = errstr
+			defer func() {
+				res.Endpoints = append(res.Endpoints, *status)
+			}()
+			u, err := url.ParseRequestURI(endpoint)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+
+			h := http.Header{}
+			h.Set("Range", "0-0")
+			rsp, err := api.GET(callctx, u.Path, u.Query(), h)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+			defer rsp.Body.Close()
+			body, err := io.ReadAll(rsp.Body)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+			var b = []interface{}{}
+			err = json.Unmarshal(body, &b)
+			if err != nil {
+				status.Message = err.Error()
+				return true, status.Message
+			}
+
+			if len(b) != 1 {
+				status.Message = fmt.Sprintf("worng result (%d)", len(b))
+				return true, status.Message
+			}
+			status.Status = "ok"
+
+			return false, "got valid response"
 		},
 	}
 }
 
-func healthcheckEndpointEpochInfo() healthcheckTask {
+func healthcheckCheckRPC() healthcheckTask {
 	return healthcheckTask{
-		Name: "check-endpoint(epoch_info)",
+		Name: "check-rpcs",
 		Do: func(ctx *cli.Context, res *HealthcheckResponse) (fail bool, msg string) {
-			return false, "check-endpoint(epoch_info) not implemented"
+			return false, "not implemented"
 		},
 	}
 }
