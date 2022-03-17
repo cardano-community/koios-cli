@@ -47,9 +47,8 @@ type HealthcheckResponse struct {
 
 	RPC struct {
 	} `json:"chk_rpcs"`
-	Cache []HealthcheckResult `json:"chk_cache_status"`
-	Limit struct {
-	} `json:"chk_limit"`
+	Cache     []HealthcheckResult `json:"chk_cache_status"`
+	Limit     *HealthcheckResult  `json:"chk_limit"`
 	Endpoints []struct {
 		Endpoint string `json:"endpoint"`
 	} `json:"chk_endpt_get"`
@@ -438,7 +437,30 @@ func healthcheckCheckLimit() healthcheckTask {
 	return healthcheckTask{
 		Name: "check-limit",
 		Do: func(ctx *cli.Context, res *HealthcheckResponse) (fail bool, msg string) {
-			return false, "check-limit not implemented"
+			res.Limit = &HealthcheckResult{}
+			res.Limit.Task = "check-limit"
+			res.Limit.Status = errstr
+
+			rsp, err := api.GET(callctx, "/blocks", nil, nil)
+			if err != nil {
+				res.Limit.Message = err.Error()
+				return true, err.Error()
+			}
+			defer rsp.Body.Close()
+
+			if rsp.Header.Get("content-range") != "0-999/*" {
+				msg := fmt.Sprintf(
+					"The PostgREST config for uses a custom limit that does not match monitoring instances expected 999 got %s",
+					rsp.Header.Get("content-range"),
+				)
+				res.Limit.Status = errstr
+				res.Limit.Message = msg
+				return true, msg
+			}
+			ok := "PostgREST config limit is 999"
+			res.Limit.Status = "ok"
+			res.Limit.Message = ok
+			return false, ok
 		},
 	}
 }
