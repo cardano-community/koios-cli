@@ -18,7 +18,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/url"
@@ -434,6 +433,20 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 				return nil
 			},
 		},
+		{
+			Name:      "asset-policy-info",
+			Category:  "ASSET",
+			Usage:     "Get the information for all assets under the same policy.",
+			ArgsUsage: "[policy-id]",
+			Action: func(ctx *cli.Context) error {
+				if ctx.NArg() != 1 {
+					return fmt.Errorf("%w: %s", ErrCommand, "asset-policy-info requires single policy-id")
+				}
+				res, err := api.GetAssetPolicyInfo(callctx, koios.PolicyID(ctx.Args().Get(0)))
+				apiOutput(ctx, res, err)
+				return nil
+			},
+		},
 	}...)
 }
 
@@ -601,9 +614,6 @@ func attachAPINetworkCommmands(apicmd *cli.Command) {
 			Category: "NETWORK",
 			Usage:    "Get the tip info about the latest block seen by chain.",
 			Action: func(ctx *cli.Context) error {
-				if api == nil {
-					return errors.New("x")
-				}
 				res, err := api.GetTip(callctx)
 				apiOutput(ctx, res, err)
 				return nil
