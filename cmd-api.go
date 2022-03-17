@@ -28,6 +28,7 @@ import (
 	"github.com/cardano-community/koios-go-client"
 )
 
+//nolint: gochecknoglobals
 var api *koios.Client
 
 func attachAPICommmand(app *cli.App) {
@@ -399,6 +400,32 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 			},
 			Action: func(ctx *cli.Context) error {
 				res, err := api.GetAssetSummary(
+					callctx,
+					koios.PolicyID(ctx.String("policy")),
+					koios.AssetName(ctx.String("name")),
+				)
+				apiOutput(ctx, res, err)
+				return nil
+			},
+		},
+		{
+			Name:     "asset-history",
+			Category: "ASSET",
+			Usage:    "Get the mint/burn history of an asset.",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "policy",
+					Usage:    "Asset Policy ID in hexadecimal format (hex)",
+					Required: true,
+				},
+				&cli.StringFlag{
+					Name:     "name",
+					Usage:    "Asset Name in hexadecimal format (hex)",
+					Required: true,
+				},
+			},
+			Action: func(ctx *cli.Context) error {
+				res, err := api.GetAssetHistory(
 					callctx,
 					koios.PolicyID(ctx.String("policy")),
 					koios.AssetName(ctx.String("name")),
