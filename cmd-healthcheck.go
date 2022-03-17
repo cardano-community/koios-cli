@@ -18,15 +18,22 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
+	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/urfave/cli/v2"
 
 	"github.com/cardano-community/koios-go-client"
 )
+
+const errstr = "error"
 
 type HealthcheckResponse struct {
 	Tip struct {
@@ -40,13 +47,23 @@ type HealthcheckResponse struct {
 
 	RPC struct {
 	} `json:"chk_rpcs"`
-	Cache struct {
-	} `json:"chk_cache_status"`
+	Cache []HealthcheckResult `json:"chk_cache_status"`
 	Limit struct {
 	} `json:"chk_limit"`
 	Endpoints []struct {
 		Endpoint string `json:"endpoint"`
 	} `json:"chk_endpt_get"`
+}
+
+type healthcheckTask struct {
+	Name string
+	Do   func(ctx *cli.Context, res *HealthcheckResponse) (bool, string)
+}
+
+type HealthcheckResult struct {
+	Task    string `json:"task"`
+	Status  string `json:"status"`
+	Message string `json:"message"`
 }
 
 func attachHealthcheckCommmand(app *cli.App) {
@@ -69,7 +86,12 @@ func attachHealthcheckCommmand(app *cli.App) {
 			},
 			&cli.BoolFlag{
 				Name:  "quiet",
-				Usage: "do not print nothing to sdtout",
+				Usage: "do not print nothing to stdout",
+				Value: false,
+			},
+			&cli.BoolFlag{
+				Name:  "json",
+				Usage: "print json result to stdout",
 				Value: false,
 			},
 
@@ -122,22 +144,64 @@ func attachHealthcheckCommmand(app *cli.App) {
 			return err
 		},
 		Action: func(ctx *cli.Context) error {
+			tasks := []healthcheckTask{
+				healthcheckCheckTip(),
+				healthcheckCheckRPC(),
+				healthcheckCheckCacheStatusESDL(),
+				healthcheckCheckCacheStatusEPHCLU(),
+				healthcheckCheckCacheStatusLASVE(),
+				healthcheckCheckLimit(),
+				healthcheckEndpointTxMetalabels(),
+				healthcheckEndpointEpochInfo(),
+			}
+
+			res := &HealthcheckResponse{}
+
+			for _, task := range tasks {
+				fail, msg := task.Do(ctx, res)
+				if fail {
+					if !ctx.Bool("quiet") {
+						if ctx.Bool("json") {
+							apiOutput(ctx, res, nil)
+						} else {
+							log.Println("[ERROR ]: ", task.Name, " - ", msg)
+						}
+					}
+					os.Exit(1)
+				}
+
+				if !ctx.Bool("quiet") && !ctx.Bool("json") {
+					log.Println("[  OK  ]: ", task.Name, " - ", msg)
+				}
+			}
+
+			// Output if quiet flag is not present
+			if !ctx.Bool("quiet") && ctx.Bool("json") {
+				apiOutput(ctx, res, nil)
+			}
+			return nil
+		},
+	}
+
+	app.Commands = append(app.Commands, hcmd)
+}
+
+// CHECK TIP
+// replace ./scripts/grest-helper-scripts/grest-poll.sh#L80
+// function chk_tip()s.
+func healthcheckCheckTip() healthcheckTask {
+	return healthcheckTask{
+		Name: "check-tip",
+		Do: func(ctx *cli.Context, res *HealthcheckResponse) (fail bool, msg string) {
 			tiptimeout := time.Second * time.Duration(ctx.Int("timeout"))
 			tipage := time.Second * time.Duration(ctx.Int("age"))
 			tipctx, tipcancel := context.WithTimeout(callctx, tiptimeout)
 			defer tipcancel()
 
-			res := HealthcheckResponse{}
-			var failed bool
-
-			// CHECK TIP
-			// replace ./scripts/grest-helper-scripts/grest-poll.sh#L80
-			// function chk_tip()
 			res.Tip.TipTimoutNs = tiptimeout
 			res.Tip.TipTimoutStr = tiptimeout.String()
 			tipres, err := api.GetTip(tipctx)
 
-			//nolint: nestif
 			if err != nil {
 				if err.Error() == "context deadline exceeded" {
 					tipres.StatusCode = http.StatusRequestTimeout
@@ -146,39 +210,253 @@ func attachHealthcheckCommmand(app *cli.App) {
 					tipres.Error.Message = fmt.Sprintf("instance did not respond within %s", tiptimeout)
 					tipres.Error.Details = "to increase the timeout value adjust the --timeout flag value (n) seconds"
 				}
-				failed = true
-			} else {
-				reqtime, err := time.Parse(time.RFC1123, tipres.Date)
-				if err != nil {
-					return err
-				}
-				blocktime, err := time.Parse("2006-01-02T15:04:05", tipres.Data.BlockTime)
-				if err != nil {
-					return err
-				}
-				res.Tip.LastBlockAgeNs = reqtime.Sub(blocktime)
-				res.Tip.LastBlockAgeStr = res.Tip.LastBlockAgeNs.String()
-				res.Tip.Response = tipres.Response
-				res.Tip.Data = tipres.Data
-
-				if res.Tip.LastBlockAgeNs > tipage {
-					failed = true
-				}
+				return true, tipres.Error.Message
 			}
 
-			// Output if quiet flag is not present
-			if !ctx.Bool("quiet") {
-				apiOutput(ctx, res, nil)
+			reqtime, err := time.Parse(time.RFC1123, tipres.Date)
+			if err != nil {
+				return true, err.Error()
 			}
-
-			// exit with code 1 if any checks failed
-			if failed {
-				os.Exit(1)
+			blocktime, err := time.Parse("2006-01-02T15:04:05", tipres.Data.BlockTime)
+			if err != nil {
+				return true, err.Error()
 			}
+			res.Tip.LastBlockAgeNs = reqtime.Sub(blocktime)
+			res.Tip.LastBlockAgeStr = res.Tip.LastBlockAgeNs.String()
+			res.Tip.Response = tipres.Response
+			res.Tip.Data = tipres.Data
 
-			return nil
+			if res.Tip.LastBlockAgeNs > tipage {
+				return false, fmt.Sprint("tip has expired - age ", res.Tip.LastBlockAgeStr)
+			}
+			return false, fmt.Sprint("tip age ", res.Tip.LastBlockAgeStr)
 		},
 	}
+}
 
-	app.Commands = append(app.Commands, hcmd)
+func healthcheckCheckRPC() healthcheckTask {
+	return healthcheckTask{
+		Name: "check-rpcs",
+		Do: func(ctx *cli.Context, res *HealthcheckResponse) (fail bool, msg string) {
+			return false, "not implemented"
+		},
+	}
+}
+
+func healthcheckCheckCacheStatusESDL() healthcheckTask {
+	return healthcheckTask{
+		Name: "check-cache-status(eq.stake_distribution_lbh)",
+		Do: func(ctx *cli.Context, res *HealthcheckResponse) (fail bool, msg string) {
+			status := &HealthcheckResult{}
+			status.Task = "eq.stake_distribution_lbh"
+			status.Status = errstr
+			defer func() {
+				res.Cache = append(res.Cache, *status)
+			}()
+
+			q := url.Values{}
+			q.Set("key", "eq.stake_distribution_lbh")
+
+			rsp, err := api.GET(callctx, "/control_table", q, nil)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+			defer rsp.Body.Close()
+
+			body, err := io.ReadAll(rsp.Body)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+
+			var pl = []struct {
+				Value string `json:"last_value"`
+			}{}
+			err = json.Unmarshal(body, &pl)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+			if len(pl) != 1 {
+				return true, fmt.Sprintf("invalid response length %d", len(pl))
+			}
+
+			blockNo, err := strconv.Atoi(pl[0].Value)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+			diff := res.Tip.Data.BlockNo - blockNo
+			if diff > 1000 {
+				msg := fmt.Sprintf("Stake Distribution cache too far from tip  (%d) blocks", diff)
+				status.Message = msg
+				return true, msg
+			}
+			ok := fmt.Sprintf("block diff %d", diff)
+			status.Status = "ok"
+			status.Message = ok
+			return false, msg
+		},
+	}
+}
+
+func healthcheckCheckCacheStatusEPHCLU() healthcheckTask {
+	return healthcheckTask{
+		Name: "check-cache-status(eq.pool_history_cache_last_updated)",
+		Do: func(ctx *cli.Context, res *HealthcheckResponse) (fail bool, msg string) {
+			status := &HealthcheckResult{}
+			status.Task = "eq.pool_history_cache_last_updated"
+			status.Status = errstr
+			defer func() {
+				res.Cache = append(res.Cache, *status)
+			}()
+
+			q := url.Values{}
+			q.Set("key", "eq.pool_history_cache_last_updated")
+
+			rsp, err := api.GET(callctx, "/control_table", q, nil)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+			defer rsp.Body.Close()
+
+			body, err := io.ReadAll(rsp.Body)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+
+			var pl = []struct {
+				Value string `json:"last_value"`
+			}{}
+			err = json.Unmarshal(body, &pl)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+			if len(pl) != 1 {
+				msg := fmt.Sprintf("invalid response length %d", len(pl))
+				status.Message = msg
+				return true, msg
+			}
+
+			ts, err := time.Parse("2006-01-02 15:04:05.99999", pl[0].Value)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+			bts, err := time.Parse("2006-01-02T15:04:05", res.Tip.Data.BlockTime)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+			diff := bts.Second() - ts.Second()
+
+			if diff > 1000 {
+				msg := fmt.Sprintf("Pool History cache too far from tip (%s)", (time.Duration(diff) * time.Second).String())
+				status.Message = msg
+				return true, msg
+			}
+			ok := fmt.Sprintf(
+				"time diff %s",
+				(time.Duration(diff) * time.Second).String(),
+			)
+			status.Message = ok
+			return false, ok
+		},
+	}
+}
+
+func healthcheckCheckCacheStatusLASVE() healthcheckTask {
+	return healthcheckTask{
+		Name: "check-cache-status(eq.last_active_stake_validated_epoch)",
+		Do: func(ctx *cli.Context, res *HealthcheckResponse) (fail bool, msg string) {
+			status := &HealthcheckResult{}
+			status.Task = "eq.pool_history_cache_last_updated"
+			status.Status = errstr
+			defer func() {
+				res.Cache = append(res.Cache, *status)
+			}()
+
+			q := url.Values{}
+			q.Set("key", "eq.pool_history_cache_last_updated")
+
+			rsp, err := api.GET(callctx, "/control_table", q, nil)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+			defer rsp.Body.Close()
+
+			body, err := io.ReadAll(rsp.Body)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+
+			var pl = []struct {
+				Value string `json:"last_value"`
+			}{}
+			err = json.Unmarshal(body, &pl)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+			if len(pl) != 1 {
+				status.Message = err.Error()
+				return true, "Active Stake cache not populated"
+			}
+
+			ts, err := time.Parse("2006-01-02 15:04:05.99999", pl[0].Value)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+			bts, err := time.Parse("2006-01-02T15:04:05", res.Tip.Data.BlockTime)
+			if err != nil {
+				status.Message = err.Error()
+				return true, err.Error()
+			}
+			diff := bts.Second() - ts.Second()
+
+			if diff > 1000 {
+				msg := fmt.Sprintf("Active Stake cache too far from tip %s", (time.Duration(diff) * time.Second).String())
+				status.Message = msg
+				return true, msg
+			}
+			ok := fmt.Sprintf("time diff %s", (time.Duration(diff) * time.Second).String())
+			status.Status = "ok"
+			status.Message = ok
+			return false, ok
+		},
+	}
+}
+
+func healthcheckCheckLimit() healthcheckTask {
+	return healthcheckTask{
+		Name: "check-limit",
+		Do: func(ctx *cli.Context, res *HealthcheckResponse) (fail bool, msg string) {
+			return false, "check-limit not implemented"
+		},
+	}
+}
+
+func healthcheckEndpointTxMetalabels() healthcheckTask {
+	return healthcheckTask{
+		Name: "check-endpoint(tx_metalabels)",
+		Do: func(ctx *cli.Context, res *HealthcheckResponse) (fail bool, msg string) {
+			return false, "heck-endpoint(tx_metalabels) not implemented"
+		},
+	}
+}
+
+func healthcheckEndpointEpochInfo() healthcheckTask {
+	return healthcheckTask{
+		Name: "check-endpoint(epoch_info)",
+		Do: func(ctx *cli.Context, res *HealthcheckResponse) (fail bool, msg string) {
+			return false, "check-endpoint(epoch_info) not implemented"
+		},
+	}
 }

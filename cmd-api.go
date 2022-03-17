@@ -585,9 +585,10 @@ func attachAPIEpochCommmands(apicmd *cli.Command) {
 func attachAPIGeneralCommmands(apicmd *cli.Command) {
 	apicmd.Subcommands = append(apicmd.Subcommands, []*cli.Command{
 		{
-			Name:     "get",
-			Usage:    "send GET request to the specified API endpoint",
-			Category: "UTILS",
+			Name:      "get",
+			Usage:     "send GET request to the specified API endpoint",
+			Category:  "UTILS",
+			ArgsUsage: "[endpoint]",
 			Action: func(ctx *cli.Context) error {
 				uri := ctx.Args().Get(0)
 				if len(uri) == 0 {
@@ -608,9 +609,10 @@ func attachAPIGeneralCommmands(apicmd *cli.Command) {
 			},
 		},
 		{
-			Name:     "post",
-			Usage:    "send POST request to the specified API endpoint",
-			Category: "UTILS",
+			Name:      "post",
+			Usage:     "send POST request to the specified API endpoint",
+			Category:  "UTILS",
+			ArgsUsage: "[endpoint] [payload]",
 			Action: func(ctx *cli.Context) error {
 				uri := ctx.Args().Get(0)
 				pl := ctx.Args().Get(1)
@@ -635,9 +637,10 @@ func attachAPIGeneralCommmands(apicmd *cli.Command) {
 			},
 		},
 		{
-			Name:     "head",
-			Usage:    "head issues a HEAD request to the specified API endpoint",
-			Category: "UTILS",
+			Name:      "head",
+			Usage:     "head issues a HEAD request to the specified API endpoint",
+			Category:  "UTILS",
+			ArgsUsage: "[endpoint]",
 			Action: func(ctx *cli.Context) error {
 				uri := ctx.Args().Get(0)
 				if ctx.NArg() == 0 || len(uri) == 0 {
