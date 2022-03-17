@@ -18,6 +18,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/url"
@@ -28,41 +29,48 @@ import (
 	"github.com/cardano-community/koios-go-client"
 )
 
-func attachAPICommmand(app *cli.App) {
-	api, err := koios.New()
-	handleErr(err)
+var api *koios.Client
 
+func attachAPICommmand(app *cli.App) {
 	apicmd := &cli.Command{
 		Name:     "api",
 		Category: "KOIOS REST API",
 		Usage:    "Interact with Koios API REST endpoints",
 		Flags:    apiCommonFlags(),
 		Before: func(c *cli.Context) error {
+			var (
+				hostopt koios.Option
+				err     error
+			)
 			if c.Bool("testnet") {
-				handleErr(koios.Host(koios.TestnetHost)(api))
+				hostopt = koios.Host(koios.TestnetHost)
 			} else {
-				handleErr(koios.Host(c.String("host"))(api))
+				hostopt = koios.Host(c.String("host"))
 			}
-			handleErr(koios.APIVersion(c.String("api-version"))(api))
-			handleErr(koios.Port(uint16(c.Uint("port")))(api))
-			handleErr(koios.Schema(c.String("schema"))(api))
-			handleErr(koios.RateLimit(uint8(c.Uint("rate-limit")))(api))
-			handleErr(koios.Origin(c.String("origin"))(api))
-			handleErr(koios.CollectRequestsStats(c.Bool("enable-req-stats"))(api))
-			return nil
+
+			api, err = koios.New(
+				hostopt,
+				koios.APIVersion(c.String("api-version")),
+				koios.Port(uint16(c.Uint("port"))),
+				koios.Scheme(c.String("scheme")),
+				koios.RateLimit(c.Int("rate-limit")),
+				koios.Origin(c.String("origin")),
+				koios.CollectRequestsStats(c.Bool("enable-req-stats")),
+			)
+			return err
 		},
 	}
 
-	attachAPIAccountCommmands(apicmd, api)
-	attachAPIAddressCommmands(apicmd, api)
-	attachAPIAssetsCommmands(apicmd, api)
-	attachAPIBlocksCommmands(apicmd, api)
-	attachAPIEpochCommmands(apicmd, api)
-	attachAPIGeneralCommmands(apicmd, api)
-	attachAPINetworkCommmands(apicmd, api)
-	attachAPIScriptCommmands(apicmd, api)
-	attachAPITransactionsCommmands(apicmd, api)
-	attachAPIPoolCommmands(apicmd, api)
+	attachAPIAccountCommmands(apicmd)
+	attachAPIAddressCommmands(apicmd)
+	attachAPIAssetsCommmands(apicmd)
+	attachAPIBlocksCommmands(apicmd)
+	attachAPIEpochCommmands(apicmd)
+	attachAPIGeneralCommmands(apicmd)
+	attachAPINetworkCommmands(apicmd)
+	attachAPIScriptCommmands(apicmd)
+	attachAPITransactionsCommmands(apicmd)
+	attachAPIPoolCommmands(apicmd)
 
 	app.Commands = append(app.Commands, apicmd)
 }
@@ -86,9 +94,9 @@ func apiCommonFlags() []cli.Flag {
 			Value: koios.DefaultAPIVersion,
 		},
 		&cli.StringFlag{
-			Name:  "schema",
-			Usage: "Set URL schema",
-			Value: koios.DefaultSchema,
+			Name:  "scheme",
+			Usage: "Set URL scheme",
+			Value: koios.DefaultScheme,
 		},
 		&cli.StringFlag{
 			Name:  "origin",
@@ -118,7 +126,7 @@ func apiCommonFlags() []cli.Flag {
 	}
 }
 
-func attachAPIAccountCommmands(apicmd *cli.Command, api *koios.Client) {
+func attachAPIAccountCommmands(apicmd *cli.Command) {
 	apicmd.Subcommands = append(apicmd.Subcommands, []*cli.Command{
 		{
 			Name:     "account-list",
@@ -228,7 +236,7 @@ func attachAPIAccountCommmands(apicmd *cli.Command, api *koios.Client) {
 	}...)
 }
 
-func attachAPIAddressCommmands(apicmd *cli.Command, api *koios.Client) {
+func attachAPIAddressCommmands(apicmd *cli.Command) {
 	apicmd.Subcommands = append(apicmd.Subcommands, []*cli.Command{
 		{
 			Name:      "address-info",
@@ -309,7 +317,7 @@ func attachAPIAddressCommmands(apicmd *cli.Command, api *koios.Client) {
 	}...)
 }
 
-func attachAPIAssetsCommmands(apicmd *cli.Command, api *koios.Client) {
+func attachAPIAssetsCommmands(apicmd *cli.Command) {
 	apicmd.Subcommands = append(apicmd.Subcommands, []*cli.Command{
 		{
 			Name:     "asset-list",
@@ -429,7 +437,7 @@ func attachAPIAssetsCommmands(apicmd *cli.Command, api *koios.Client) {
 	}...)
 }
 
-func attachAPIBlocksCommmands(apicmd *cli.Command, api *koios.Client) {
+func attachAPIBlocksCommmands(apicmd *cli.Command) {
 	apicmd.Subcommands = append(apicmd.Subcommands, []*cli.Command{
 		{
 			Name:     "blocks",
@@ -484,7 +492,7 @@ func attachAPIBlocksCommmands(apicmd *cli.Command, api *koios.Client) {
 	}...)
 }
 
-func attachAPIEpochCommmands(apicmd *cli.Command, api *koios.Client) {
+func attachAPIEpochCommmands(apicmd *cli.Command) {
 	apicmd.Subcommands = append(apicmd.Subcommands, []*cli.Command{
 		{
 			Name:     "epoch-info",
@@ -536,7 +544,7 @@ func attachAPIEpochCommmands(apicmd *cli.Command, api *koios.Client) {
 	}...)
 }
 
-func attachAPIGeneralCommmands(apicmd *cli.Command, api *koios.Client) {
+func attachAPIGeneralCommmands(apicmd *cli.Command) {
 	apicmd.Subcommands = append(apicmd.Subcommands, []*cli.Command{
 		{
 			Name:     "get",
@@ -586,13 +594,16 @@ func attachAPIGeneralCommmands(apicmd *cli.Command, api *koios.Client) {
 	}...)
 }
 
-func attachAPINetworkCommmands(apicmd *cli.Command, api *koios.Client) {
+func attachAPINetworkCommmands(apicmd *cli.Command) {
 	apicmd.Subcommands = append(apicmd.Subcommands, []*cli.Command{
 		{
 			Name:     "tip",
 			Category: "NETWORK",
 			Usage:    "Get the tip info about the latest block seen by chain.",
 			Action: func(ctx *cli.Context) error {
+				if api == nil {
+					return errors.New("x")
+				}
 				res, err := api.GetTip(callctx)
 				apiOutput(ctx, res, err)
 				return nil
@@ -634,14 +645,24 @@ func attachAPINetworkCommmands(apicmd *cli.Command, api *koios.Client) {
 	}...)
 }
 
-func attachAPIScriptCommmands(apicmd *cli.Command, api *koios.Client) {
+func attachAPIScriptCommmands(apicmd *cli.Command) {
 	apicmd.Subcommands = append(apicmd.Subcommands, []*cli.Command{
 		{
-			Name:     "script-list",
+			Name:     "native-script-list",
 			Category: "SCRIPT",
-			Usage:    "List of all existing script hashes along with their creation transaction hashes.",
+			Usage:    "List of all existing native script hashes along with their creation transaction hashes.",
 			Action: func(ctx *cli.Context) error {
-				res, err := api.GetScriptList(callctx)
+				res, err := api.GetNativeScriptList(callctx)
+				apiOutput(ctx, res, err)
+				return nil
+			},
+		},
+		{
+			Name:     "plutus-script-list",
+			Category: "SCRIPT",
+			Usage:    "List of all existing Plutus script hashes along with their creation transaction hashes.",
+			Action: func(ctx *cli.Context) error {
+				res, err := api.GetPlutusScriptList(callctx)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -663,7 +684,7 @@ func attachAPIScriptCommmands(apicmd *cli.Command, api *koios.Client) {
 	}...)
 }
 
-func attachAPITransactionsCommmands(apicmd *cli.Command, api *koios.Client) {
+func attachAPITransactionsCommmands(apicmd *cli.Command) {
 	apicmd.Subcommands = append(apicmd.Subcommands, []*cli.Command{
 		{
 			Name:      "txs-infos",
@@ -804,7 +825,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command, api *koios.Client) {
 	}...)
 }
 
-func attachAPIPoolCommmands(apicmd *cli.Command, api *koios.Client) {
+func attachAPIPoolCommmands(apicmd *cli.Command) {
 	apicmd.Subcommands = append(apicmd.Subcommands, []*cli.Command{
 		{
 			Name:     "pool-list",
