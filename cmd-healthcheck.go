@@ -360,6 +360,7 @@ func healthcheckCheckCacheStatusEPHCLU() healthcheckTask {
 				(time.Duration(diff) * time.Second).String(),
 			)
 			status.Message = ok
+			status.Status = "ok"
 			return false, ok
 		},
 	}
