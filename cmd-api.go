@@ -80,10 +80,9 @@ func attachAPICommmand(app *cli.App) {
 func apiCommonFlags() []cli.Flag {
 	return []cli.Flag{
 		&cli.UintFlag{
-			Name:    "port",
-			Aliases: []string{"p"},
-			Usage:   "Set port",
-			Value:   uint(koios.DefaultPort),
+			Name:  "port",
+			Usage: "Set port",
+			Value: uint(koios.DefaultPort),
 		},
 		&cli.StringFlag{
 			Name:  "host",
@@ -157,6 +156,7 @@ func attachAPIAccountCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "address",
+					Aliases:  []string{"a"},
 					Usage:    "Cardano payment address in bech32 format",
 					Required: true,
 				},
@@ -173,12 +173,14 @@ func attachAPIAccountCommmands(apicmd *cli.Command) {
 			Usage:    "Get the full rewards history (including MIR) for a stake address, or certain epoch if specified.",
 			Flags: []cli.Flag{
 				&cli.Uint64Flag{
-					Name:  "epoch",
-					Usage: "Filter for earned rewards Epoch Number.",
-					Value: uint64(0),
+					Name:    "epoch",
+					Aliases: []string{"e"},
+					Usage:   "Filter for earned rewards Epoch Number.",
+					Value:   uint64(0),
 				},
 				&cli.StringFlag{
 					Name:     "address",
+					Aliases:  []string{"a"},
 					Usage:    "Cardano payment address in bech32 format",
 					Required: true,
 				},
@@ -201,6 +203,7 @@ func attachAPIAccountCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "address",
+					Aliases:  []string{"a"},
 					Usage:    "Cardano payment address in bech32 format",
 					Required: true,
 				},
@@ -218,6 +221,7 @@ func attachAPIAccountCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "address",
+					Aliases:  []string{"a"},
 					Usage:    "Cardano payment address in bech32 format",
 					Required: true,
 				},
@@ -235,6 +239,7 @@ func attachAPIAccountCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "address",
+					Aliases:  []string{"a"},
 					Usage:    "Cardano payment address in bech32 format",
 					Required: true,
 				},
@@ -252,6 +257,7 @@ func attachAPIAccountCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "address",
+					Aliases:  []string{"a"},
 					Usage:    "Cardano payment address in bech32 format",
 					Required: true,
 				},
@@ -274,6 +280,7 @@ func attachAPIAddressCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "address",
+					Aliases:  []string{"a"},
 					Usage:    "Cardano payment address in bech32 format",
 					Required: true,
 				},
@@ -297,6 +304,7 @@ func attachAPIAddressCommmands(apicmd *cli.Command) {
 				},
 				&cli.StringSliceFlag{
 					Name:     "address",
+					Aliases:  []string{"a"},
 					Usage:    "Cardano payment address in bech32 format, can be used multiple times for list of addresses",
 					Required: true,
 				},
@@ -319,6 +327,7 @@ func attachAPIAddressCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "address",
+					Aliases:  []string{"a"},
 					Usage:    "Cardano payment address in bech32 format",
 					Required: true,
 				},
@@ -342,6 +351,7 @@ func attachAPIAddressCommmands(apicmd *cli.Command) {
 				},
 				&cli.StringSliceFlag{
 					Name:     "payment-credential",
+					Aliases:  []string{"c"},
 					Usage:    "Cardano payment credential, can be used multiple times for list of addresses",
 					Required: true,
 				},
@@ -379,11 +389,13 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "policy",
+					Aliases:  []string{"p"},
 					Usage:    "Asset Policy ID in hexadecimal format (hex)",
 					Required: true,
 				},
 				&cli.StringFlag{
 					Name:     "name",
+					Aliases:  []string{"n"},
 					Usage:    "Asset Name in hexadecimal format (hex)",
 					Required: true,
 				},
@@ -406,11 +418,13 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "policy",
+					Aliases:  []string{"p"},
 					Usage:    "Asset Policy ID in hexadecimal format (hex)",
 					Required: true,
 				},
 				&cli.StringFlag{
 					Name:     "name",
+					Aliases:  []string{"n"},
 					Usage:    "Asset Name in hexadecimal format (hex)",
 					Required: true,
 				},
@@ -434,11 +448,13 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "policy",
+					Aliases:  []string{"p"},
 					Usage:    "Asset Policy ID in hexadecimal format (hex)",
 					Required: true,
 				},
 				&cli.StringFlag{
 					Name:     "name",
+					Aliases:  []string{"n"},
 					Usage:    "Asset Name in hexadecimal format (hex)",
 					Required: true,
 				},
@@ -461,11 +477,13 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "policy",
+					Aliases:  []string{"p"},
 					Usage:    "Asset Policy ID in hexadecimal format (hex)",
 					Required: true,
 				},
 				&cli.StringFlag{
 					Name:     "name",
+					Aliases:  []string{"n"},
 					Usage:    "Asset Name in hexadecimal format (hex)",
 					Required: true,
 				},
@@ -488,11 +506,13 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "policy",
+					Aliases:  []string{"p"},
 					Usage:    "Asset Policy ID in hexadecimal format (hex)",
 					Required: true,
 				},
 				&cli.StringFlag{
 					Name:     "name",
+					Aliases:  []string{"n"},
 					Usage:    "Asset Name in hexadecimal format (hex)",
 					Required: true,
 				},
@@ -515,6 +535,7 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "policy",
+					Aliases:  []string{"p"},
 					Usage:    "Asset Policy ID in hexadecimal format (hex)",
 					Required: true,
 				},
@@ -547,6 +568,7 @@ func attachAPIBlocksCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringSliceFlag{
 					Name:     "block-hash",
+					Aliases:  []string{"b"},
 					Usage:    "Block Hashes in hex format, can be used multiple times for list of blocks",
 					Required: true,
 				},
@@ -572,6 +594,7 @@ func attachAPIBlocksCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "block-hash",
+					Aliases:  []string{"b"},
 					Usage:    "Block Hash in hex format to fetch details for",
 					Required: true,
 				},
@@ -593,6 +616,7 @@ func attachAPIBlocksCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "block-hash",
+					Aliases:  []string{"b"},
 					Usage:    "Block Hash in hex format to fetch details for",
 					Required: true,
 				},
@@ -618,9 +642,10 @@ func attachAPIEpochCommmands(apicmd *cli.Command) {
 			Usage:    "Get the epoch information, all epochs if no epoch specified.",
 			Flags: []cli.Flag{
 				&cli.Uint64Flag{
-					Name:  "epoch",
-					Usage: "Epoch Number to fetch details for",
-					Value: uint64(0),
+					Name:    "epoch",
+					Aliases: []string{"e"},
+					Usage:   "Epoch Number to fetch details for",
+					Value:   uint64(0),
 				},
 			},
 			Action: func(ctx *cli.Context) error {
@@ -642,9 +667,10 @@ func attachAPIEpochCommmands(apicmd *cli.Command) {
 				"returns information about all epochs if no epoch specified.",
 			Flags: []cli.Flag{
 				&cli.Uint64Flag{
-					Name:  "epoch",
-					Usage: "Epoch Number to fetch details for",
-					Value: uint64(0),
+					Name:    "epoch",
+					Aliases: []string{"e"},
+					Usage:   "Epoch Number to fetch details for",
+					Value:   uint64(0),
 				},
 			},
 			Action: func(ctx *cli.Context) error {
@@ -777,8 +803,9 @@ func attachAPINetworkCommmands(apicmd *cli.Command) {
 				"supply and reserves in lovelace for specified epoch, all epochs if empty.",
 			Flags: []cli.Flag{
 				&cli.UintFlag{
-					Name:  "epoch",
-					Usage: "Epoch Number to fetch details for",
+					Name:    "epoch",
+					Aliases: []string{"e"},
+					Usage:   "Epoch Number to fetch details for",
 				},
 			},
 			Action: func(ctx *cli.Context) error {
@@ -825,6 +852,7 @@ func attachAPIScriptCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "script-hash",
+					Aliases:  []string{"s"},
 					Usage:    "Script hash in hexadecimal format (hex)",
 					Required: true,
 				},
@@ -847,6 +875,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringSliceFlag{
 					Name:     "tx-hash",
+					Aliases:  []string{"t"},
 					Usage:    "Transaction Hashes, can be used multiple times for list of transactions",
 					Required: true,
 				},
@@ -868,6 +897,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "tx-hash",
+					Aliases:  []string{"t"},
 					Usage:    "Transaction Hash to fetch details for",
 					Required: true,
 				},
@@ -885,6 +915,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "tx-hash",
+					Aliases:  []string{"t"},
 					Usage:    "Transaction Hash to fetch details for",
 					Required: true,
 				},
@@ -902,6 +933,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringSliceFlag{
 					Name:     "tx-hash",
+					Aliases:  []string{"t"},
 					Usage:    "Transaction Hash in hex format, can be used multiple times for list of transactions",
 					Required: true,
 				},
@@ -922,6 +954,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "tx-hash",
+					Aliases:  []string{"t"},
 					Usage:    "Transaction Hash to fetch details for",
 					Required: true,
 				},
@@ -974,6 +1007,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringSliceFlag{
 					Name:     "tx-hash",
+					Aliases:  []string{"t"},
 					Usage:    "Transaction Hash in hex format, can be used multiple times for list of transactions",
 					Required: true,
 				},
@@ -995,6 +1029,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "tx-hash",
+					Aliases:  []string{"t"},
 					Usage:    "Transaction Hash to fetch details for",
 					Required: true,
 				},
@@ -1027,6 +1062,7 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringSliceFlag{
 					Name:     "pool-id",
+					Aliases:  []string{"p"},
 					Usage:    "Pool ids bech32 format, can be used multiple times for list of transactions",
 					Required: true,
 				},
@@ -1048,6 +1084,7 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "pool-id",
+					Aliases:  []string{"p"},
 					Usage:    "Pool ids bech32 format",
 					Required: true,
 				},
@@ -1064,12 +1101,14 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 			Usage:    "Return information about delegators by a given pool and optional epoch (current if omitted).",
 			Flags: []cli.Flag{
 				&cli.Uint64Flag{
-					Name:  "epoch",
-					Usage: "Epoch Number to fetch details for",
-					Value: uint64(0),
+					Name:    "epoch",
+					Aliases: []string{"e"},
+					Usage:   "Epoch Number to fetch details for",
+					Value:   uint64(0),
 				},
 				&cli.StringFlag{
 					Name:     "pool-id",
+					Aliases:  []string{"p"},
 					Usage:    "Pool ids bech32 format",
 					Required: true,
 				},
@@ -1092,12 +1131,14 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 			Usage:    "Return information about delegators by a given pool and optional epoch (current if omitted).",
 			Flags: []cli.Flag{
 				&cli.Uint64Flag{
-					Name:  "epoch",
-					Usage: "Epoch Number to fetch details for",
-					Value: uint64(0),
+					Name:    "epoch",
+					Aliases: []string{"e"},
+					Usage:   "Epoch Number to fetch details for",
+					Value:   uint64(0),
 				},
 				&cli.StringFlag{
 					Name:     "pool-id",
+					Aliases:  []string{"p"},
 					Usage:    "Pool ids bech32 format",
 					Required: true,
 				},
@@ -1120,12 +1161,14 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 			Usage:    "Return information about blocks minted by a given pool in current epoch (or _epoch_no if provided).",
 			Flags: []cli.Flag{
 				&cli.Uint64Flag{
-					Name:  "epoch",
-					Usage: "Epoch Number to fetch details for",
-					Value: uint64(0),
+					Name:    "epoch",
+					Aliases: []string{"e"},
+					Usage:   "Epoch Number to fetch details for",
+					Value:   uint64(0),
 				},
 				&cli.StringFlag{
 					Name:     "pool-id",
+					Aliases:  []string{"p"},
 					Usage:    "Pool ids bech32 format",
 					Required: true,
 				},
@@ -1149,6 +1192,7 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringFlag{
 					Name:     "pool-id",
+					Aliases:  []string{"p"},
 					Usage:    "Pool ids bech32 format",
 					Required: true,
 				},
@@ -1178,6 +1222,7 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringSliceFlag{
 					Name:     "pool-id",
+					Aliases:  []string{"p"},
 					Usage:    "Pool ids bech32 format, can be used multiple times for list of transactions",
 					Required: true,
 				},
