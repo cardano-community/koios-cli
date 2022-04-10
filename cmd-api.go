@@ -55,6 +55,10 @@ func attachAPICommmand(app *cli.App) {
 				koios.Origin(c.String("origin")),
 				koios.CollectRequestsStats(c.Bool("enable-req-stats")),
 			)
+			opts = api.NewRequestOptions()
+			opts.Page(c.Uint("page"))
+			opts.PageSize(c.Uint("page-size"))
+
 			return err
 		},
 	}
@@ -121,6 +125,16 @@ func apiCommonFlags() []cli.Flag {
 			Usage: "use default testnet as host.",
 			Value: false,
 		},
+		&cli.UintFlag{
+			Name:  "page",
+			Usage: "Set current page for request",
+			Value: 1,
+		},
+		&cli.UintFlag{
+			Name:  "page-size",
+			Usage: "Set page size for request",
+			Value: 1000,
+		},
 	}
 }
 
@@ -131,89 +145,102 @@ func attachAPIAccountCommmands(apicmd *cli.Command) {
 			Category: "ACCOUNT",
 			Usage:    "Get a list of all accounts returns array of stake addresses.",
 			Action: func(ctx *cli.Context) error {
-				res, err := api.GetAccountList(callctx)
+				res, err := api.GetAccountList(callctx, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
-			Name:      "account-info",
-			Category:  "ACCOUNT",
-			Usage:     "Get the account info of any (payment or staking) address.",
-			ArgsUsage: "[account]",
+			Name:     "account-info",
+			Category: "ACCOUNT",
+			Usage:    "Get the account info of any (payment or staking) address.",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "address",
+					Usage:    "Cardano payment address in bech32 format",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "account-info requires single address")
-				}
-				res, err := api.GetAccountInfo(callctx, koios.Address(ctx.Args().Get(0)))
+				res, err := api.GetAccountInfo(callctx, koios.Address(ctx.String("address")), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
-			Name:      "account-rewards",
-			Category:  "ACCOUNT",
-			Usage:     "Get the full rewards history (including MIR) for a stake address, or certain epoch if specified.",
-			ArgsUsage: "[stake-address]",
+			Name:     "account-rewards",
+			Category: "ACCOUNT",
+			Usage:    "Get the full rewards history (including MIR) for a stake address, or certain epoch if specified.",
 			Flags: []cli.Flag{
 				&cli.Uint64Flag{
 					Name:  "epoch",
 					Usage: "Filter for earned rewards Epoch Number.",
 					Value: uint64(0),
 				},
+				&cli.StringFlag{
+					Name:     "address",
+					Usage:    "Cardano payment address in bech32 format",
+					Required: true,
+				},
 			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "account-rewards requires single stake address")
-				}
 				var epoch *koios.EpochNo
 				if ctx.Uint("epoch") > 0 {
 					v := koios.EpochNo(ctx.Uint64("epoch"))
 					epoch = &v
 				}
-				res, err := api.GetAccountRewards(callctx, koios.StakeAddress(ctx.Args().Get(0)), epoch)
+				res, err := api.GetAccountRewards(callctx, koios.StakeAddress(ctx.String("address")), epoch, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
-			Name:      "account-updates",
-			Category:  "ACCOUNT",
-			Usage:     "Get the account updates (registration, deregistration, delegation and withdrawals).",
-			ArgsUsage: "[stake-address]",
+			Name:     "account-updates",
+			Category: "ACCOUNT",
+			Usage:    "Get the account updates (registration, deregistration, delegation and withdrawals).",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "address",
+					Usage:    "Cardano payment address in bech32 format",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "account-updates requires single stake address")
-				}
-				res, err := api.GetAccountUpdates(callctx, koios.StakeAddress(ctx.Args().Get(0)))
+				res, err := api.GetAccountUpdates(callctx, koios.StakeAddress(ctx.String("address")), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
-			Name:      "account-addresses",
-			Category:  "ACCOUNT",
-			Usage:     "Get all addresses associated with an account payment or staking address",
-			ArgsUsage: "[account]",
+			Name:     "account-addresses",
+			Category: "ACCOUNT",
+			Usage:    "Get all addresses associated with an account payment or staking address",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "address",
+					Usage:    "Cardano payment address in bech32 format",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "account-updates requires single stake or payment address")
-				}
-				res, err := api.GetAccountAddresses(callctx, koios.StakeAddress(ctx.Args().Get(0)))
+				res, err := api.GetAccountAddresses(callctx, koios.StakeAddress(ctx.String("address")), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
-			Name:      "account-assets",
-			Category:  "ACCOUNT",
-			Usage:     "Get the native asset balance of an account.",
-			ArgsUsage: "[account]",
+			Name:     "account-assets",
+			Category: "ACCOUNT",
+			Usage:    "Get the native asset balance of an account.",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "address",
+					Usage:    "Cardano payment address in bech32 format",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "account-updates requires single stake or payment address")
-				}
-				res, err := api.GetAccountAssets(callctx, koios.StakeAddress(ctx.Args().Get(0)))
+				res, err := api.GetAccountAssets(callctx, koios.StakeAddress(ctx.String("address")), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -222,11 +249,15 @@ func attachAPIAccountCommmands(apicmd *cli.Command) {
 			Name:     "account-history",
 			Category: "ACCOUNT",
 			Usage:    "Get the staking history of an account.",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "address",
+					Usage:    "Cardano payment address in bech32 format",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "account-history requires single stake or payment address")
-				}
-				res, err := api.GetAccountHistory(callctx, koios.StakeAddress(ctx.Args().Get(0)))
+				res, err := api.GetAccountHistory(callctx, koios.StakeAddress(ctx.String("address")), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -237,15 +268,18 @@ func attachAPIAccountCommmands(apicmd *cli.Command) {
 func attachAPIAddressCommmands(apicmd *cli.Command) {
 	apicmd.Subcommands = append(apicmd.Subcommands, []*cli.Command{
 		{
-			Name:      "address-info",
-			Category:  "ADDRESS",
-			Usage:     "Get address info - balance, associated stake address (if any) and UTxO set.",
-			ArgsUsage: "[address]",
+			Name:     "address-info",
+			Category: "ADDRESS",
+			Usage:    "Get address info - balance, associated stake address (if any) and UTxO set.",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "address",
+					Usage:    "Cardano payment address in bech32 format",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "address-info requires single address")
-				}
-				res, err := api.GetAddressInfo(callctx, koios.Address(ctx.Args().Get(0)))
+				res, err := api.GetAddressInfo(callctx, koios.Address(ctx.String("address")), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -255,35 +289,42 @@ func attachAPIAddressCommmands(apicmd *cli.Command) {
 			Category: "ADDRESS",
 			Usage: "Get the transaction hash list of input address array, optionally " +
 				"filtering after specified block height (inclusive).",
-			ArgsUsage: "[address...]",
 			Flags: []cli.Flag{
 				&cli.Uint64Flag{
 					Name:  "after-block-height",
 					Usage: "Get transactions after specified block height.",
 					Value: uint64(0),
 				},
+				&cli.StringSliceFlag{
+					Name:     "address",
+					Usage:    "Cardano payment address in bech32 format, can be used multiple times for list of addresses",
+					Required: true,
+				},
 			},
 			Action: func(ctx *cli.Context) error {
 				var addresses []koios.Address
-				for _, a := range ctx.Args().Slice() {
+				for _, a := range ctx.StringSlice("address") {
 					addresses = append(addresses, koios.Address(a))
 				}
 
-				res, err := api.GetAddressTxs(callctx, addresses, ctx.Uint64("after-block-height"))
+				res, err := api.GetAddressTxs(callctx, addresses, ctx.Uint64("after-block-height"), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
-			Name:      "address-assets",
-			Category:  "ADDRESS",
-			Usage:     "Get the list of all the assets (policy, name and quantity) for a given address.",
-			ArgsUsage: "[address]",
+			Name:     "address-assets",
+			Category: "ADDRESS",
+			Usage:    "Get the list of all the assets (policy, name and quantity) for a given address.",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "address",
+					Usage:    "Cardano payment address in bech32 format",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "address-info requires single address")
-				}
-				res, err := api.GetAddressAssets(callctx, koios.Address(ctx.Args().Get(0)))
+				res, err := api.GetAddressAssets(callctx, koios.Address(ctx.String("address")), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -291,23 +332,27 @@ func attachAPIAddressCommmands(apicmd *cli.Command) {
 		{
 			Name:     "credential-txs",
 			Category: "ADDRESS",
-			Usage: "Get the transaction hash list of input payment credential array, " +
+			Usage: "Get the transaction hash list of input payment credentials, " +
 				"optionally filtering after specified block height (inclusive).",
-			ArgsUsage: "[address...]",
 			Flags: []cli.Flag{
 				&cli.Uint64Flag{
 					Name:  "after-block-height",
 					Usage: "Get transactions after specified block height.",
 					Value: uint64(0),
 				},
+				&cli.StringSliceFlag{
+					Name:     "payment-credential",
+					Usage:    "Cardano payment credential, can be used multiple times for list of addresses",
+					Required: true,
+				},
 			},
 			Action: func(ctx *cli.Context) error {
 				var credentials []koios.PaymentCredential
-				for _, c := range ctx.Args().Slice() {
+				for _, c := range ctx.StringSlice("payment-credential") {
 					credentials = append(credentials, koios.PaymentCredential(c))
 				}
 
-				res, err := api.GetCredentialTxs(callctx, credentials, ctx.Uint64("after-block-height"))
+				res, err := api.GetCredentialTxs(callctx, credentials, ctx.Uint64("after-block-height"), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -322,7 +367,7 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 			Category: "ASSET",
 			Usage:    "Get the list of all native assets (paginated).",
 			Action: func(ctx *cli.Context) error {
-				res, err := api.GetAssetList(callctx)
+				res, err := api.GetAssetList(callctx, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -348,6 +393,7 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 					callctx,
 					koios.PolicyID(ctx.String("policy")),
 					koios.AssetName(ctx.String("name")),
+					opts,
 				)
 				apiOutput(ctx, res, err)
 				return nil
@@ -374,6 +420,7 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 					callctx,
 					koios.PolicyID(ctx.String("policy")),
 					koios.AssetName(ctx.String("name")),
+					opts,
 				)
 				apiOutput(ctx, res, err)
 				return nil
@@ -401,6 +448,7 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 					callctx,
 					koios.PolicyID(ctx.String("policy")),
 					koios.AssetName(ctx.String("name")),
+					opts,
 				)
 				apiOutput(ctx, res, err)
 				return nil
@@ -427,6 +475,7 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 					callctx,
 					koios.PolicyID(ctx.String("policy")),
 					koios.AssetName(ctx.String("name")),
+					opts,
 				)
 				apiOutput(ctx, res, err)
 				return nil
@@ -453,21 +502,25 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 					callctx,
 					koios.PolicyID(ctx.String("policy")),
 					koios.AssetName(ctx.String("name")),
+					opts,
 				)
 				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
-			Name:      "asset-policy-info",
-			Category:  "ASSET",
-			Usage:     "Get the information for all assets under the same policy.",
-			ArgsUsage: "[policy-id]",
+			Name:     "asset-policy-info",
+			Category: "ASSET",
+			Usage:    "Get the information for all assets under the same policy.",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "policy",
+					Usage:    "Asset Policy ID in hexadecimal format (hex)",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "asset-policy-info requires single policy-id")
-				}
-				res, err := api.GetAssetPolicyInfo(callctx, koios.PolicyID(ctx.Args().Get(0)))
+				res, err := api.GetAssetPolicyInfo(callctx, koios.PolicyID(ctx.String("policy")), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -482,7 +535,32 @@ func attachAPIBlocksCommmands(apicmd *cli.Command) {
 			Category: "BLOCK",
 			Usage:    "Get summarised details about all blocks (paginated - latest first).",
 			Action: func(ctx *cli.Context) error {
-				res, err := api.GetBlocks(callctx)
+				res, err := api.GetBlocks(callctx, opts)
+				apiOutput(ctx, res, err)
+				return nil
+			},
+		},
+		{
+			Name:     "blocks-info",
+			Category: "BLOCK",
+			Usage:    "Get detailed information about a blocks.",
+			Flags: []cli.Flag{
+				&cli.StringSliceFlag{
+					Name:     "block-hash",
+					Usage:    "Block Hashes in hex format as separated list to fetch details for, can be used multiple times for list of blocks",
+					Required: true,
+				},
+			},
+			Action: func(ctx *cli.Context) error {
+				var bhses []koios.BlockHash
+				for _, h := range ctx.StringSlice("block-hash") {
+					bhses = append(bhses, koios.BlockHash(h))
+				}
+				res, err := api.GetBlocksInfo(
+					callctx,
+					bhses,
+					opts,
+				)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -502,6 +580,7 @@ func attachAPIBlocksCommmands(apicmd *cli.Command) {
 				res, err := api.GetBlockInfo(
 					callctx,
 					koios.BlockHash(ctx.String("block-hash")),
+					opts,
 				)
 				apiOutput(ctx, res, err)
 				return nil
@@ -522,6 +601,7 @@ func attachAPIBlocksCommmands(apicmd *cli.Command) {
 				res, err := api.GetBlockTxHashes(
 					callctx,
 					koios.BlockHash(ctx.String("block-hash")),
+					opts,
 				)
 				apiOutput(ctx, res, err)
 				return nil
@@ -550,7 +630,7 @@ func attachAPIEpochCommmands(apicmd *cli.Command) {
 					epoch = &v
 				}
 
-				res, err := api.GetEpochInfo(callctx, epoch)
+				res, err := api.GetEpochInfo(callctx, epoch, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -574,7 +654,7 @@ func attachAPIEpochCommmands(apicmd *cli.Command) {
 					epoch = &v
 				}
 
-				res, err := api.GetEpochParams(callctx, epoch)
+				res, err := api.GetEpochParams(callctx, epoch, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -598,7 +678,9 @@ func attachAPIGeneralCommmands(apicmd *cli.Command) {
 				u, err := url.ParseRequestURI(uri)
 				handleErr(err)
 
-				res, err := api.GET(callctx, u.Path, u.Query(), nil)
+				opts.QueryApply(u.Query())
+
+				res, err := api.GET(callctx, u.Path, opts)
 				handleErr(err)
 				defer res.Body.Close()
 				body, err := io.ReadAll(res.Body)
@@ -626,7 +708,9 @@ func attachAPIGeneralCommmands(apicmd *cli.Command) {
 				u, err := url.ParseRequestURI(uri)
 				handleErr(err)
 
-				res, err := api.POST(callctx, u.Path, strings.NewReader(pl), u.Query(), nil)
+				opts.QueryApply(u.Query())
+
+				res, err := api.POST(callctx, u.Path, strings.NewReader(pl), opts)
 				handleErr(err)
 				defer res.Body.Close()
 				body, err := io.ReadAll(res.Body)
@@ -649,7 +733,9 @@ func attachAPIGeneralCommmands(apicmd *cli.Command) {
 				u, err := url.ParseRequestURI(uri)
 				handleErr(err)
 
-				res, err := api.HEAD(callctx, u.Path, u.Query(), nil)
+				opts.QueryApply(u.Query())
+
+				res, err := api.HEAD(callctx, u.Path, opts)
 				handleErr(err)
 				if res.Body != nil {
 					res.Body.Close()
@@ -669,7 +755,7 @@ func attachAPINetworkCommmands(apicmd *cli.Command) {
 			Category: "NETWORK",
 			Usage:    "Get the tip info about the latest block seen by chain.",
 			Action: func(ctx *cli.Context) error {
-				res, err := api.GetTip(callctx)
+				res, err := api.GetTip(callctx, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -679,7 +765,7 @@ func attachAPINetworkCommmands(apicmd *cli.Command) {
 			Category: "NETWORK",
 			Usage:    "Get the Genesis parameters used to start specific era on chain.",
 			Action: func(ctx *cli.Context) error {
-				res, err := api.GetGenesis(callctx)
+				res, err := api.GetGenesis(callctx, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -702,7 +788,7 @@ func attachAPINetworkCommmands(apicmd *cli.Command) {
 					epoch = &v
 				}
 
-				res, err := api.GetTotals(callctx, epoch)
+				res, err := api.GetTotals(callctx, epoch, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -717,7 +803,7 @@ func attachAPIScriptCommmands(apicmd *cli.Command) {
 			Category: "SCRIPT",
 			Usage:    "List of all existing native script hashes along with their creation transaction hashes.",
 			Action: func(ctx *cli.Context) error {
-				res, err := api.GetNativeScriptList(callctx)
+				res, err := api.GetNativeScriptList(callctx, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -727,21 +813,24 @@ func attachAPIScriptCommmands(apicmd *cli.Command) {
 			Category: "SCRIPT",
 			Usage:    "List of all existing Plutus script hashes along with their creation transaction hashes.",
 			Action: func(ctx *cli.Context) error {
-				res, err := api.GetPlutusScriptList(callctx)
+				res, err := api.GetPlutusScriptList(callctx, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
-			Name:      "script-redeemers",
-			Category:  "SCRIPT",
-			Usage:     "List of all redeemers for a given script hash.",
-			ArgsUsage: "[script_hash]",
+			Name:     "script-redeemers",
+			Category: "SCRIPT",
+			Usage:    "List of all redeemers for a given script hash.",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "script-hash",
+					Usage:    "Script hash in hexadecimal format (hex)",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "script-redeemers requires single script-hash as arg")
-				}
-				res, err := api.GetScriptRedeemers(callctx, koios.ScriptHash(ctx.Args().Get(0)))
+				res, err := api.GetScriptRedeemers(callctx, koios.ScriptHash(ctx.String("script-hash")), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -752,74 +841,94 @@ func attachAPIScriptCommmands(apicmd *cli.Command) {
 func attachAPITransactionsCommmands(apicmd *cli.Command) {
 	apicmd.Subcommands = append(apicmd.Subcommands, []*cli.Command{
 		{
-			Name:      "txs-infos",
-			Category:  "TRANSACTIONS",
-			Usage:     "Get detailed information about transaction(s).",
-			ArgsUsage: "[tx-hashes...]",
+			Name:     "txs-info",
+			Category: "TRANSACTIONS",
+			Usage:    "Get detailed information about transaction(s).",
+			Flags: []cli.Flag{
+				&cli.StringSliceFlag{
+					Name:     "tx-hash",
+					Usage:    "Transaction Hashes in hex format as separated list to fetch details for, can be used multiple times for list of transactions",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
 				var txs []koios.TxHash
-				for _, a := range ctx.Args().Slice() {
-					txs = append(txs, koios.TxHash(a))
+				for _, tx := range ctx.StringSlice("tx-hash") {
+					txs = append(txs, koios.TxHash(tx))
 				}
-				res, err := api.GetTxsInfos(callctx, txs)
+				res, err := api.GetTxsInfo(callctx, txs, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
-			Name:      "tx-info",
-			Category:  "TRANSACTIONS",
-			Usage:     "Get detailed information about single transaction.",
-			ArgsUsage: "[tx-hash]",
+			Name:     "tx-info",
+			Category: "TRANSACTIONS",
+			Usage:    "Get detailed information about single transaction.",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "tx-hash",
+					Usage:    "Transaction Hash to fetch details for",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "tx-info requires single transaction hash")
-				}
-				res, err := api.GetTxInfo(callctx, koios.TxHash(ctx.Args().Get(0)))
+				res, err := api.GetTxInfo(callctx, koios.TxHash(ctx.String("tx-hash")), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
-			Name:      "tx-utxos",
-			Category:  "TRANSACTIONS",
-			Usage:     "Get UTxO set (inputs/apiOutputs) of transactions.",
-			ArgsUsage: "[tx-hashes...]",
+			Name:     "tx-utxos",
+			Category: "TRANSACTIONS",
+			Usage:    "Get UTxO set (inputs/apiOutputs) of transactions.",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "tx-hash",
+					Usage:    "Transaction Hash to fetch details for",
+					Required: true,
+				},
+			},
+			Action: func(ctx *cli.Context) error {
+				res, err := api.GetTxUTxOs(callctx, koios.TxHash(ctx.String("tx-hash")), opts)
+				apiOutput(ctx, res, err)
+				return nil
+			},
+		},
+		{
+			Name:     "txs-metadata",
+			Category: "TRANSACTIONS",
+			Usage:    "Get metadata information (if any) for given transaction(s).",
+			Flags: []cli.Flag{
+				&cli.StringSliceFlag{
+					Name:     "tx-hash",
+					Usage:    "Transaction Hash in hex format, can be used multiple times for list of transactions",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
 				var txs []koios.TxHash
-				for _, a := range ctx.Args().Slice() {
-					txs = append(txs, koios.TxHash(a))
+				for _, tx := range ctx.StringSlice("tx-hash") {
+					txs = append(txs, koios.TxHash(tx))
 				}
-				res, err := api.GetTxsUTxOs(callctx, txs)
+				res, err := api.GetTxsMetadata(callctx, txs, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
-			Name:      "txs-metadata",
-			Category:  "TRANSACTIONS",
-			ArgsUsage: "[tx-hashes...]",
-			Usage:     "Get metadata information (if any) for given transaction(s).",
-			Action: func(ctx *cli.Context) error {
-				var txs []koios.TxHash
-				for _, a := range ctx.Args().Slice() {
-					txs = append(txs, koios.TxHash(a))
-				}
-				res, err := api.GetTxsMetadata(callctx, txs)
-				apiOutput(ctx, res, err)
-				return nil
+			Name:     "tx-metadata",
+			Category: "TRANSACTIONS",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "tx-hash",
+					Usage:    "Transaction Hash to fetch details for",
+					Required: true,
+				},
 			},
-		},
-		{
-			Name:      "tx-metadata",
-			Category:  "TRANSACTIONS",
-			ArgsUsage: "[tx-hash]",
-			Usage:     "Get metadata information (if any) for given transaction.",
+			Usage: "Get metadata information (if any) for given transaction.",
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "tx-metadata requires single transaction hash")
-				}
-				res, err := api.GetTxMetadata(callctx, koios.TxHash(ctx.Args().Get(0)))
+				res, err := api.GetTxMetadata(callctx, koios.TxHash(ctx.String("tx-hash")), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -829,7 +938,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command) {
 			Category: "TRANSACTIONS",
 			Usage:    "Get a list of all transaction metalabels.",
 			Action: func(ctx *cli.Context) error {
-				res, err := api.GetTxMetaLabels(callctx)
+				res, err := api.GetTxMetaLabels(callctx, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -853,36 +962,45 @@ func attachAPITransactionsCommmands(apicmd *cli.Command) {
 				if err = json.Unmarshal(txfile, &stx); err != nil {
 					return err
 				}
-				res, err := api.SubmitSignedTx(callctx, stx)
+				res, err := api.SubmitSignedTx(callctx, stx, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
-			Name:      "txs-statuses",
-			Category:  "TRANSACTIONS",
-			Usage:     "Get the number of block confirmations for a given transaction hash list",
-			ArgsUsage: "[tx-hashes...]",
+			Name:     "txs-statuses",
+			Category: "TRANSACTIONS",
+			Usage:    "Get the number of block confirmations for a given transaction hash list",
+			Flags: []cli.Flag{
+				&cli.StringSliceFlag{
+					Name:     "tx-hash",
+					Usage:    "Transaction Hash in hex format, can be used multiple times for list of transactions",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
 				var txs []koios.TxHash
-				for _, a := range ctx.Args().Slice() {
-					txs = append(txs, koios.TxHash(a))
+				for _, tx := range ctx.StringSlice("tx-hash") {
+					txs = append(txs, koios.TxHash(tx))
 				}
-				res, err := api.GetTxsStatuses(callctx, txs)
+				res, err := api.GetTxsStatuses(callctx, txs, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
-			Name:      "tx-status",
-			Category:  "TRANSACTIONS",
-			Usage:     "Get the number of block confirmations for a given transaction hash",
-			ArgsUsage: "[tx-hash]",
+			Name:     "tx-status",
+			Category: "TRANSACTIONS",
+			Usage:    "Get the number of block confirmations for a given transaction hash",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "tx-hash",
+					Usage:    "Transaction Hash to fetch details for",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "tx-status requires single transaction hash")
-				}
-				res, err := api.GetTxStatus(callctx, koios.TxHash(ctx.Args().Get(0)))
+				res, err := api.GetTxStatus(callctx, koios.TxHash(ctx.String("tx-hash")), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -897,36 +1015,45 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 			Category: "POOL",
 			Usage:    "A list of all currently registered/retiring (not retired) pools.",
 			Action: func(ctx *cli.Context) error {
-				res, err := api.GetPoolList(callctx)
+				res, err := api.GetPoolList(callctx, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
-			Name:      "pool-infos",
-			Category:  "POOL",
-			Usage:     "Current pool statuses and details for a specified list of pool ids.",
-			ArgsUsage: "[pool-id...]",
+			Name:     "pool-infos",
+			Category: "POOL",
+			Usage:    "Current pool statuses and details for a specified list of pool ids.",
+			Flags: []cli.Flag{
+				&cli.StringSliceFlag{
+					Name:     "pool-id",
+					Usage:    "Pool ids bech32 format, can be used multiple times for list of transactions",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
 				var pids []koios.PoolID
-				for _, pid := range ctx.Args().Slice() {
+				for _, pid := range ctx.StringSlice("pool-id") {
 					pids = append(pids, koios.PoolID(pid))
 				}
-				res, err := api.GetPoolInfos(callctx, pids)
+				res, err := api.GetPoolInfos(callctx, pids, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
 		},
 		{
-			Name:      "pool-info",
-			Category:  "POOL",
-			Usage:     "Current pool status and details for a specified pool by pool id.",
-			ArgsUsage: "[pool-id]",
+			Name:     "pool-info",
+			Category: "POOL",
+			Usage:    "Current pool status and details for a specified pool by pool id.",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "pool-id",
+					Usage:    "Pool ids bech32 format",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "pool-info requires single pool id")
-				}
-				res, err := api.GetPoolInfo(callctx, koios.PoolID(ctx.Args().Get(0)))
+				res, err := api.GetPoolInfo(callctx, koios.PoolID(ctx.String("pool-id")), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -941,18 +1068,20 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 					Usage: "Epoch Number to fetch details for",
 					Value: uint64(0),
 				},
+				&cli.StringFlag{
+					Name:     "pool-id",
+					Usage:    "Pool ids bech32 format",
+					Required: true,
+				},
 			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "pool-delegators requires single pool id")
-				}
 				var epoch *koios.EpochNo
 				if ctx.Uint("epoch") > 0 {
 					v := koios.EpochNo(ctx.Uint64("epoch"))
 					epoch = &v
 				}
 
-				res, err := api.GetPoolDelegators(callctx, koios.PoolID(ctx.Args().Get(0)), epoch)
+				res, err := api.GetPoolDelegators(callctx, koios.PoolID(ctx.String("pool-id")), epoch, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -967,18 +1096,21 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 					Usage: "Epoch Number to fetch details for",
 					Value: uint64(0),
 				},
+				&cli.StringFlag{
+					Name:     "pool-id",
+					Usage:    "Pool ids bech32 format",
+					Required: true,
+				},
 			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "pool-delegators requires single pool id")
-				}
+
 				var epoch *koios.EpochNo
 				if ctx.Uint("epoch") > 0 {
 					v := koios.EpochNo(ctx.Uint64("epoch"))
 					epoch = &v
 				}
 
-				res, err := api.GetPoolHistory(callctx, koios.PoolID(ctx.Args().Get(0)), epoch)
+				res, err := api.GetPoolHistory(callctx, koios.PoolID(ctx.String("pool-id")), epoch, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -993,18 +1125,20 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 					Usage: "Epoch Number to fetch details for",
 					Value: uint64(0),
 				},
+				&cli.StringFlag{
+					Name:     "pool-id",
+					Usage:    "Pool ids bech32 format",
+					Required: true,
+				},
 			},
 			Action: func(ctx *cli.Context) error {
-				if ctx.NArg() != 1 {
-					return fmt.Errorf("%w: %s", ErrCommand, "pool-blocks requires single pool id")
-				}
 				var epoch *koios.EpochNo
 				if ctx.Uint("epoch") > 0 {
 					v := koios.EpochNo(ctx.Uint64("epoch"))
 					epoch = &v
 				}
 
-				res, err := api.GetPoolBlocks(callctx, koios.PoolID(ctx.Args().Get(0)), epoch)
+				res, err := api.GetPoolBlocks(callctx, koios.PoolID(ctx.String("pool-id")), epoch, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -1013,14 +1147,17 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 			Name:     "pool-updates",
 			Category: "POOL",
 			Usage:    "Return all pool updates for all pools or only updates for specific pool if specified.",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "pool-id",
+					Usage:    "Pool ids bech32 format",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
-				var pool *koios.PoolID
-				if ctx.NArg() == 1 {
-					v := koios.PoolID(ctx.Args().Get(0))
-					pool = &v
-				}
+				pool := koios.PoolID(ctx.String("pool-id"))
 
-				res, err := api.GetPoolUpdates(callctx, pool)
+				res, err := api.GetPoolUpdates(callctx, &pool, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -1030,7 +1167,7 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 			Category: "POOL",
 			Usage:    "A list of registered relays for all currently registered/retiring (not retired) pools.",
 			Action: func(ctx *cli.Context) error {
-				res, err := api.GetPoolRelays(callctx)
+				res, err := api.GetPoolRelays(callctx, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
@@ -1039,8 +1176,20 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 			Name:     "pool-metadata",
 			Category: "POOL",
 			Usage:    "Metadata(on & off-chain) for all currently registered/retiring (not retired) pools.",
+			Flags: []cli.Flag{
+				&cli.StringSliceFlag{
+					Name:     "pool-id",
+					Usage:    "Pool ids bech32 format, can be used multiple times for list of transactions",
+					Required: true,
+				},
+			},
 			Action: func(ctx *cli.Context) error {
-				res, err := api.GetPoolMetadata(callctx)
+				var pids []koios.PoolID
+				for _, pid := range ctx.StringSlice("pool-id") {
+					pids = append(pids, koios.PoolID(pid))
+				}
+
+				res, err := api.GetPoolMetadata(callctx, pids, opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},

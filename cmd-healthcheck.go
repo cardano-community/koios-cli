@@ -137,7 +137,7 @@ func attachHealthcheckCommmand(app *cli.App) {
 				koios.Scheme(c.String("scheme")),
 				koios.CollectRequestsStats(true),
 			)
-
+			opts = api.NewRequestOptions()
 			return err
 		},
 		Action: func(ctx *cli.Context) error {
@@ -205,7 +205,7 @@ func healthcheckCheckTip() healthcheckTask {
 
 			res.Tip.TipTimoutNs = tiptimeout
 			res.Tip.TipTimoutStr = tiptimeout.String()
-			tipres, err := api.GetTip(tipctx)
+			tipres, err := api.GetTip(tipctx, nil)
 
 			if err != nil {
 				if err.Error() == "context deadline exceeded" {
@@ -250,10 +250,8 @@ func healthcheckCheckCacheStatusESDL() healthcheckTask {
 				res.Cache = append(res.Cache, *status)
 			}()
 
-			q := url.Values{}
-			q.Set("key", "eq.stake_distribution_lbh")
-
-			rsp, err := api.GET(callctx, "/control_table", q, nil)
+			opts.QuerySet("key", "eq.stake_distribution_lbh")
+			rsp, err := api.GET(callctx, "/control_table", opts)
 			if err != nil {
 				status.Message = err.Error()
 				return true, err.Error()
@@ -308,10 +306,8 @@ func healthcheckCheckCacheStatusEPHCLU() healthcheckTask {
 				res.Cache = append(res.Cache, *status)
 			}()
 
-			q := url.Values{}
-			q.Set("key", "eq.pool_history_cache_last_updated")
-
-			rsp, err := api.GET(callctx, "/control_table", q, nil)
+			opts.QuerySet("key", "eq.pool_history_cache_last_updated")
+			rsp, err := api.GET(callctx, "/control_table", opts)
 			if err != nil {
 				status.Message = err.Error()
 				return true, err.Error()
@@ -377,10 +373,8 @@ func healthcheckCheckCacheStatusLASVE() healthcheckTask {
 				res.Cache = append(res.Cache, *status)
 			}()
 
-			q := url.Values{}
-			q.Set("key", "eq.pool_history_cache_last_updated")
-
-			rsp, err := api.GET(callctx, "/control_table", q, nil)
+			opts.QuerySet("key", "eq.pool_history_cache_last_updated")
+			rsp, err := api.GET(callctx, "/control_table", opts)
 			if err != nil {
 				status.Message = err.Error()
 				return true, err.Error()
@@ -439,7 +433,7 @@ func healthcheckCheckLimit() healthcheckTask {
 			res.Limit.Task = "check-limit"
 			res.Limit.Status = errstr
 
-			rsp, err := api.GET(callctx, "/blocks", nil, nil)
+			rsp, err := api.GET(callctx, "/blocks", nil)
 			if err != nil {
 				res.Limit.Message = err.Error()
 				return true, err.Error()
@@ -480,9 +474,11 @@ func healthcheckEndpoints(endpoint string) healthcheckTask {
 				return true, err.Error()
 			}
 
-			h := http.Header{}
-			h.Set("Range", "0-0")
-			rsp, err := api.GET(callctx, u.Path, u.Query(), h)
+			opts.Page(1)
+			opts.PageSize(1)
+			opts.QueryApply(u.Query())
+
+			rsp, err := api.GET(callctx, u.Path, opts)
 			if err != nil {
 				status.Message = err.Error()
 				return true, err.Error()

@@ -44,7 +44,8 @@ var (
 	date    = ""
 
 	//nolint: gochecknoglobals
-	api *koios.Client
+	api  *koios.Client
+	opts *koios.RequestOptions
 )
 
 //nolint:gochecknoinits
