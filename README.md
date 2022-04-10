@@ -87,7 +87,9 @@ COMMANDS:
      asset-address-list  Get the list of all addresses holding a given asset.
      asset-info          Get the information of an asset including first minting & token registry metadata.
      asset-summary       Get the summary of an asset (total transactions exclude minting/total wallets include only wallets with asset balance).
+     asset-history       Get the mint/burn history of an asset.
      asset-txs           Get the list of all asset transaction hashes (newest first).
+     asset-policy-info   Get the information for all assets under the same policy.
    BLOCK:
      blocks      Get summarised details about all blocks (paginated - latest first).
      block-info  Get detailed information about a specific block.
@@ -104,17 +106,19 @@ COMMANDS:
      pool-infos       Current pool statuses and details for a specified list of pool ids.
      pool-info        Current pool status and details for a specified pool by pool id.
      pool-delegators  Return information about delegators by a given pool and optional epoch (current if omitted).
+     pool-history     Return information about delegators by a given pool and optional epoch (current if omitted).
      pool-blocks      Return information about blocks minted by a given pool in current epoch (or _epoch_no if provided).
      pool-updates     Return all pool updates for all pools or only updates for specific pool if specified.
      pool-relays      A list of registered relays for all currently registered/retiring (not retired) pools.
      pool-metadata    Metadata(on & off-chain) for all currently registered/retiring (not retired) pools.
    SCRIPT:
-     script-list       List of all existing script hashes along with their creation transaction hashes.
-     script-redeemers  List of all redeemers for a given script hash.
+     native-script-list  List of all existing native script hashes along with their creation transaction hashes.
+     plutus-script-list  List of all existing Plutus script hashes along with their creation transaction hashes.
+     script-redeemers    List of all redeemers for a given script hash.
    TRANSACTIONS:
      txs-infos      Get detailed information about transaction(s).
      tx-info        Get detailed information about single transaction.
-     tx-utxos       Get UTxO set (inputs/outputs) of transactions.
+     tx-utxos       Get UTxO set (inputs/apiOutputs) of transactions.
      txs-metadata   Get metadata information (if any) for given transaction(s).
      tx-metadata    Get metadata information (if any) for given transaction.
      tx-metalabels  Get a list of all transaction metalabels.
@@ -122,14 +126,15 @@ COMMANDS:
      txs-statuses   Get the number of block confirmations for a given transaction hash list
      tx-status      Get the number of block confirmations for a given transaction hash
    UTILS:
-     get   get issues a GET request to the specified API endpoint
+     get   send GET request to the specified API endpoint
+     post  send POST request to the specified API endpoint
      head  head issues a HEAD request to the specified API endpoint
 
 OPTIONS:
    --port value, -p value  Set port (default: 443)
    --host value            Set host (default: "api.koios.rest")
    --api-version value     Set API version (default: "v0")
-   --schema value          Set URL schema (default: "https")
+   --scheme value          Set URL scheme (default: "https")
    --origin value          Set Origin header for requests. (default: "https://github.com/cardano-community/koios-go-client")
    --rate-limit value      Set API Client rate limit for outgoing requests (default: 5)
    --no-format             prints response json strings directly without calling json pretty. (default: false)
@@ -181,7 +186,7 @@ koios-cli api --enable-req-stats tip
 ```shell
 koios-cli api --enable-req-stats --testnet tip
 # OR
-koios-cli --enable-req-stats --host testnet.koios.rest tip
+koios-cli api --enable-req-stats --host testnet.koios.rest tip
 ```
 
 **response**

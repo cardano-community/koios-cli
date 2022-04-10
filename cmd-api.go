@@ -547,7 +547,7 @@ func attachAPIBlocksCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringSliceFlag{
 					Name:     "block-hash",
-					Usage:    "Block Hashes in hex format as separated list to fetch details for, can be used multiple times for list of blocks",
+					Usage:    "Block Hashes in hex format, can be used multiple times for list of blocks",
 					Required: true,
 				},
 			},
@@ -847,7 +847,7 @@ func attachAPITransactionsCommmands(apicmd *cli.Command) {
 			Flags: []cli.Flag{
 				&cli.StringSliceFlag{
 					Name:     "tx-hash",
-					Usage:    "Transaction Hashes in hex format as separated list to fetch details for, can be used multiple times for list of transactions",
+					Usage:    "Transaction Hashes, can be used multiple times for list of transactions",
 					Required: true,
 				},
 			},
@@ -1103,7 +1103,6 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-
 				var epoch *koios.EpochNo
 				if ctx.Uint("epoch") > 0 {
 					v := koios.EpochNo(ctx.Uint64("epoch"))
