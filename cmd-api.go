@@ -24,9 +24,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/urfave/cli/v2"
+	cli "github.com/urfave/cli/v2"
 
-	"github.com/cardano-community/koios-go-client"
+	koios "github.com/cardano-community/koios-go-client"
 )
 
 func attachAPICommmand(app *cli.App) {

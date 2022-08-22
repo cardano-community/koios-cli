@@ -28,9 +28,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/urfave/cli/v2"
+	cli "github.com/urfave/cli/v2"
 
-	"github.com/cardano-community/koios-go-client"
+	koios "github.com/cardano-community/koios-go-client"
 )
 
 const errstr = "error"
