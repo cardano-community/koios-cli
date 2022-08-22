@@ -222,11 +222,8 @@ func healthcheckCheckTip() healthcheckTask {
 			if err != nil {
 				return true, err.Error()
 			}
-			blocktime, err := time.Parse("2006-01-02T15:04:05", tipres.Data.BlockTime)
-			if err != nil {
-				return true, err.Error()
-			}
-			res.Tip.LastBlockAgeNs = reqtime.Sub(blocktime)
+
+			res.Tip.LastBlockAgeNs = reqtime.Sub(tipres.Data.BlockTime.Time)
 			res.Tip.LastBlockAgeStr = res.Tip.LastBlockAgeNs.String()
 			res.Tip.Response = tipres.Response
 			res.Tip.Data = tipres.Data
@@ -339,12 +336,8 @@ func healthcheckCheckCacheStatusEPHCLU() healthcheckTask {
 				status.Message = err.Error()
 				return true, err.Error()
 			}
-			bts, err := time.Parse("2006-01-02T15:04:05", res.Tip.Data.BlockTime)
-			if err != nil {
-				status.Message = err.Error()
-				return true, err.Error()
-			}
-			diff := bts.Second() - ts.Second()
+
+			diff := res.Tip.Data.BlockTime.Second() - ts.Second()
 
 			if diff > 1000 {
 				msg := fmt.Sprintf("Pool History cache too far from tip (%s)", (time.Duration(diff) * time.Second).String())
@@ -405,12 +398,8 @@ func healthcheckCheckCacheStatusLASVE() healthcheckTask {
 				status.Message = err.Error()
 				return true, err.Error()
 			}
-			bts, err := time.Parse("2006-01-02T15:04:05", res.Tip.Data.BlockTime)
-			if err != nil {
-				status.Message = err.Error()
-				return true, err.Error()
-			}
-			diff := bts.Second() - ts.Second()
+
+			diff := res.Tip.Data.BlockTime.Time.Second() - ts.Second()
 
 			if diff > 1000 {
 				msg := fmt.Sprintf("Active Stake cache too far from tip %s", (time.Duration(diff) * time.Second).String())

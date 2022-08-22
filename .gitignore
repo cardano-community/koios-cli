@@ -12,6 +12,8 @@
 .env
 covprofile.coverprofile
 coverage.txt
+go.work
+go.work.sum
 
 ################################################################################
 # DIRECTORIES to ignore
