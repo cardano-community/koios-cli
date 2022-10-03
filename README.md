@@ -5,12 +5,6 @@
 > A consistent query layer for developers to build upon Cardano, with   
 > multiple, redundant endpoints that allow $$for easy scalability.
 
-**Build Status**
-
-[![linux](https://github.com/cardano-community/koios-cli/workflows/linux/badge.svg)](https://github.com/cardano-community/koios-cli/actions/workflows/linux.yml)
-[![macos](https://github.com/cardano-community/koios-cli/workflows/macos/badge.svg)](https://github.com/cardano-community/koios-cli/actions/workflows/macos.yml)
-[![windows](https://github.com/cardano-community/koios-cli/workflows/windows/badge.svg)](https://github.com/cardano-community/koios-cli/actions/workflows/windows.yml)
-
 **Development Status**
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/cardano-community/koios-cli)

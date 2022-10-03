@@ -29,10 +29,10 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/cardano-community/koios-go-client"
+	"github.com/cardano-community/koios-go-client/v2"
 )
 
-//nolint: gochecknoglobals
+// nolint: gochecknoglobals
 var (
 	ErrCommand = errors.New("command error")
 
@@ -65,20 +65,18 @@ func main() {
 		cancel()
 	}()
 
-	app := &cli.App{
-		Version: version,
-		Authors: []*cli.Author{
-			{
-				Name: "The Cardano Community Authors",
-			},
+	app := cli.NewApp()
+	app.Version = version
+	app.Authors = []*cli.Author{
+		{
+			Name: "The Cardano Community Authors",
 		},
-		Copyright:            "(c) 2022",
-		Usage:                "Koios CLI Client.",
-		EnableBashCompletion: true,
 	}
+	app.Copyright = "(c) 2022 The Cardano Community"
+	app.Usage = "Koios CLI Client"
+	app.EnableBashCompletion = true
 
 	attachAPICommmand(app)
-	attachHealthcheckCommmand(app)
 	handleErr(app.Run(os.Args))
 }
 
