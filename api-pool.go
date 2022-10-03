@@ -221,5 +221,23 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 				return nil
 			},
 		},
+		{
+			Name:     "pool-stake-snapshot",
+			Category: "POOL",
+			Usage:    "Returns Mark, Set and Go stake snapshots for the selected pool, useful for leaderlog calculation.",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "pool-id",
+					Aliases:  []string{"p"},
+					Usage:    "Pool ids bech32 format",
+					Required: true,
+				},
+			},
+			Action: func(ctx *cli.Context) error {
+				res, err := api.GetPoolSnapshot(callctx, koios.PoolID(ctx.String("pool-id")), opts)
+				apiOutput(ctx, res, err)
+				return nil
+			},
+		},
 	}...)
 }
