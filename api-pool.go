@@ -197,5 +197,29 @@ func attachAPIPoolCommmands(apicmd *cli.Command) {
 				return nil
 			},
 		},
+		{
+			Name:     "pool-delegators-history",
+			Category: "POOL",
+			Usage:    "Return information about active delegators (incl. history) for a given pool and epoch number - current epoch if not provided.",
+			Flags: []cli.Flag{
+				epochFlag,
+				&cli.StringFlag{
+					Name:     "pool-id",
+					Aliases:  []string{"p"},
+					Usage:    "Pool ids bech32 format",
+					Required: true,
+				},
+			},
+			Action: func(ctx *cli.Context) error {
+				var epoch *koios.EpochNo
+				if ctx.Uint("epoch") > 0 {
+					v := koios.EpochNo(ctx.Uint64("epoch"))
+					epoch = &v
+				}
+				res, err := api.GetPoolDelegatorsHistory(callctx, koios.PoolID(ctx.String("pool-id")), epoch, opts)
+				apiOutput(ctx, res, err)
+				return nil
+			},
+		},
 	}...)
 }
