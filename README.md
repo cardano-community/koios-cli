@@ -549,3 +549,5 @@ task cover
 [coc]: https://github.com/cardano-community/.github/blob/main/CODE_OF_CONDUCT.md
 [github]: https://github.com/cardano-community/koios-cli
 [koios-cli]: https://github.com/cardano-community/koios-cli "cardano-community/koios-cli"
+
+<!-- release -->
