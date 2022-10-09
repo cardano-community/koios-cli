@@ -1,7 +1,5 @@
 github.com/cardano-community/koios-go-client/v2 v2.0.1 h1:tFQ3Ljp7HOK9+VX1uT2MtlKNmob/BfUxg4uTq7Ne83g=
 github.com/cardano-community/koios-go-client/v2 v2.0.1/go.mod h1:l6n5BGaZq8pj6iQ/cPsEi4DDNAea++MZBCi8qIm5/gs=
-github.com/cardano-community/koios-go-client/v2 v2.0.2 h1:/9x8w5KO/xRr8QwWlqMGkYpXi4w2VimcqUW7YBKA9d8=
-github.com/cardano-community/koios-go-client/v2 v2.0.2/go.mod h1:l6n5BGaZq8pj6iQ/cPsEi4DDNAea++MZBCi8qIm5/gs=
 github.com/cpuguy83/go-md2man/v2 v2.0.2 h1:p1EgwI/C7NhT0JmVkwCD2ZBK8j4aeHQX2pMHHBfMQ6w=
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
