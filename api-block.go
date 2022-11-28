@@ -17,7 +17,7 @@
 package main
 
 import (
-	"github.com/cardano-community/koios-go-client/v2"
+	"github.com/cardano-community/koios-go-client/v3"
 	"github.com/urfave/cli/v2"
 )
 
