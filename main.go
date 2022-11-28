@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"runtime/debug"
@@ -91,7 +90,7 @@ func handleErr(err error) {
 	// 	trace = errors.Unwrap(trace)
 	// 	log.Println(trace)
 	// }
-	log.Fatal(err)
+	// log.Fatal(err)
 }
 
 // helper to print json response body.

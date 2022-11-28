@@ -56,85 +56,104 @@
 
 ```
 NAME:
+   koios-cli - Koios CLI Client
+
+USAGE:
+   koios-cli [global options] command [command options] [arguments...]
+
+VERSION:
+   (devel)
+
+AUTHOR:
+   The Cardano Community Authors
+
+COMMANDS:
+   help, h  Shows a list of commands or help for one command
+   KOIOS REST API:
+     api  Interact with Koios API REST endpoints
+
+GLOBAL OPTIONS:
+   --help, -h     show help (default: false)
+   --version, -v  print the version (default: false)
+
+COPYRIGHT:
+   (c) 2022 The Cardano Community
+[mkungla@howi-main koios-cli]$ go run . api -h
+NAME:
    koios-cli api - Interact with Koios API REST endpoints
 
 USAGE:
    koios-cli api command [command options] [arguments...]
 
 COMMANDS:
-   help, h  Shows a list of commands or help for one command
-   ACCOUNT:
-     account-list       Get a list of all accounts returns array of stake addresses.
-     account-info       Get the account info of any (payment or staking) address.
-     account-rewards    Get the full rewards history (including MIR) for a stake address, or certain epoch if specified.
-     account-updates    Get the account updates (registration, deregistration, delegation and withdrawals).
-     account-addresses  Get all addresses associated with an account payment or staking address
-     account-assets     Get the native asset balance of an account.
-     account-history    Get the staking history of an account.
-   ADDRESS:
-     address-info    Get address info - balance, associated stake address (if any) and UTxO set.
-     address-txs     Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive).
-     address-assets  Get the list of all the assets (policy, name and quantity) for a given address.
-     credential-txs  Get the transaction hash list of input payment credential array, optionally filtering after specified block height (inclusive).
-   ASSET:
-     asset-list          Get the list of all native assets (paginated).
-     asset-address-list  Get the list of all addresses holding a given asset.
-     asset-info          Get the information of an asset including first minting & token registry metadata.
-     asset-summary       Get the summary of an asset (total transactions exclude minting/total wallets include only wallets with asset balance).
-     asset-history       Get the mint/burn history of an asset.
-     asset-txs           Get the list of all asset transaction hashes (newest first).
-     asset-policy-info   Get the information for all assets under the same policy.
-   BLOCK:
-     blocks      Get summarised details about all blocks (paginated - latest first).
-     block-info  Get detailed information about a specific block.
-     block-txs   Get a list of all transactions included in a provided block.
-   EPOCH:
-     epoch-info    Get the epoch information, all epochs if no epoch specified.
-     epoch-params  Get the protocol parameters for specific epoch, returns information about all epochs if no epoch specified.
-   NETWORK:
-     tip      Get the tip info about the latest block seen by chain.
-     genesis  Get the Genesis parameters used to start specific era on chain.
-     totals   Get the circulating utxo, treasury rewards, supply and reserves in lovelace for specified epoch, all epochs if empty.
-   POOL:
-     pool-list        A list of all currently registered/retiring (not retired) pools.
-     pool-infos       Current pool statuses and details for a specified list of pool ids.
-     pool-info        Current pool status and details for a specified pool by pool id.
-     pool-delegators  Return information about delegators by a given pool and optional epoch (current if omitted).
-     pool-history     Return information about delegators by a given pool and optional epoch (current if omitted).
-     pool-blocks      Return information about blocks minted by a given pool in current epoch (or _epoch_no if provided).
-     pool-updates     Return all pool updates for all pools or only updates for specific pool if specified.
-     pool-relays      A list of registered relays for all currently registered/retiring (not retired) pools.
-     pool-metadata    Metadata(on & off-chain) for all currently registered/retiring (not retired) pools.
-   SCRIPT:
-     native-script-list  List of all existing native script hashes along with their creation transaction hashes.
-     plutus-script-list  List of all existing Plutus script hashes along with their creation transaction hashes.
-     script-redeemers    List of all redeemers for a given script hash.
-   TRANSACTIONS:
-     txs-infos      Get detailed information about transaction(s).
-     tx-info        Get detailed information about single transaction.
-     tx-utxos       Get UTxO set (inputs/apiOutputs) of transactions.
-     txs-metadata   Get metadata information (if any) for given transaction(s).
-     tx-metadata    Get metadata information (if any) for given transaction.
-     tx-metalabels  Get a list of all transaction metalabels.
-     tx-submit      Submit signed transaction to the network.
-     txs-statuses   Get the number of block confirmations for a given transaction hash list
-     tx-status      Get the number of block confirmations for a given transaction hash
-   UTILS:
-     get   send GET request to the specified API endpoint
-     post  send POST request to the specified API endpoint
-     head  head issues a HEAD request to the specified API endpoint
+   tip                      Get the tip info about the latest block seen by chain.
+   genesis                  Get the Genesis parameters used to start specific era on chain.
+   totals                   Get the circulating utxo, treasury rewards, supply and reserves in lovelace for specified epoch, all epochs if empty.
+   epoch-info               Get the epoch information, all epochs if no epoch specified.
+   epoch-params             Get the protocol parameters for specific epoch, returns information about all epochs if no epoch specified.
+   epoch-block-protocols    Get the information about block protocol distribution in epoch
+   blocks                   Get summarised details about all blocks (paginated - latest first).
+   blocks-info              Get detailed information about a blocks.
+   block-info               Get detailed information about a specific block.
+   block-txs                Get a list of all transactions included in a provided block.
+   txs-info                 Get detailed information about transaction(s).
+   tx-info                  Get detailed information about single transaction.
+   tx-utxos                 Get UTxO set (inputs/apiOutputs) of transactions.
+   txs-metadata             Get metadata information (if any) for given transaction(s).
+   tx-metadata              Get metadata information (if any) for given transaction.
+   tx-metalabels            Get a list of all transaction metalabels.
+   tx-submit                Submit signed transaction to the network.
+   txs-statuses             Get the number of block confirmations for a given transaction hash list
+   tx-status                Get the number of block confirmations for a given transaction hash
+   address-info             Get address info - balance, associated stake address (if any) and UTxO set.
+   address-txs              Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive).
+   address-assets           Get the list of all the assets (policy, name and quantity) for a given address.
+   credential-txs           Get the transaction hash list of input payment credentials, optionally filtering after specified block height (inclusive).
+   account-list             Get a list of all accounts returns array of stake addresses.
+   account-info             Get the account info of any (payment or staking) address.
+   account-rewards          Get the full rewards history (including MIR) for a stake address, or certain epoch if specified.
+   account-updates          Get the account updates (registration, deregistration, delegation and withdrawals).
+   account-addresses        Get all addresses associated with an account payment or staking address
+   account-assets           Get the native asset balance of an account.
+   account-history          Get the staking history of an account.
+   asset-list               Get the list of all native assets (paginated).
+   asset-address-list       Get the list of all addresses holding a given asset.
+   asset-info               Get the information of an asset including first minting & token registry metadata.
+   asset-summary            Get the summary of an asset (total transactions exclude minting/total wallets include only wallets with asset balance).
+   asset-history            Get the mint/burn history of an asset.
+   asset-txs                Get the list of all asset transaction hashes (newest first).
+   asset-policy-info        Get the information for all assets under the same policy.
+   pool-list                A list of all currently registered/retiring (not retired) pools.
+   pool-infos               Current pool statuses and details for a specified list of pool ids.
+   pool-info                Current pool status and details for a specified pool by pool id.
+   pool-delegators          Return information about delegators by a given pool and optional epoch (current if omitted).
+   pool-history             Return information about delegators by a given pool and optional epoch (current if omitted).
+   pool-blocks              Return information about blocks minted by a given pool in current epoch (or _epoch_no if provided).
+   pool-updates             Return all pool updates for all pools or only updates for specific pool if specified.
+   pool-relays              A list of registered relays for all currently registered/retiring (not retired) pools.
+   pool-metadata            Metadata(on & off-chain) for all currently registered/retiring (not retired) pools.
+   pool-delegators-history  Return information about active delegators (incl. history) for a given pool and epoch number - current epoch if not provided.
+   pool-stake-snapshot      Returns Mark, Set and Go stake snapshots for the selected pool, useful for leaderlog calculation.
+   native-script-list       List of all existing native script hashes along with their creation transaction hashes.
+   plutus-script-list       List of all existing Plutus script hashes along with their creation transaction hashes.
+   script-redeemers         List of all redeemers for a given script hash.
+   help, h                  Shows a list of commands or help for one command
 
 OPTIONS:
-   --port value, -p value  Set port (default: 443)
-   --host value            Set host (default: "api.koios.rest")
-   --api-version value     Set API version (default: "v0")
-   --scheme value          Set URL scheme (default: "https")
-   --origin value          Set Origin header for requests. (default: "https://github.com/cardano-community/koios-go-client")
-   --rate-limit value      Set API Client rate limit for outgoing requests (default: 5)
-   --no-format             prints response json strings directly without calling json pretty. (default: false)
-   --enable-req-stats      Enable request stats. (default: false)
-   --testnet               use default testnet as host. (default: false)
-   --help, -h              show help (default: false)
+   --port value         Set port (default: 443)
+   --host value         Set host (default: "api.koios.rest")
+   --api-version value  Set API version (default: "v0")
+   --scheme value       Set URL scheme (default: "https")
+   --origin value       Set Origin header for requests. (default: "https://github.com/cardano-community/koios-go-client")
+   --rate-limit value   Set API Client rate limit for outgoing requests (default: 10)
+   --no-format          prints response json strings directly without calling json pretty. (default: false)
+   --enable-req-stats   Enable request stats. (default: false)
+   --preview            use preview host. (default: false)
+   --preprod            use preprod host. (default: false)
+   --guildnet           use guildnet host. (default: false)
+   --page value         Set current page for request (default: 1)
+   --page-size value    Set page size for request (default: 1000)
+   --help, -h           show help (default: false)
 ```
 
 </details>

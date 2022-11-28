@@ -59,6 +59,7 @@ func attachAPICommmand(app *cli.App) {
 				koios.Origin(c.String("origin")),
 				koios.CollectRequestsStats(c.Bool("enable-req-stats")),
 			)
+
 			opts = api.NewRequestOptions()
 			opts.SetCurrentPage(c.Uint("page"))
 			opts.SetPageSize(c.Uint("page-size"))
@@ -87,7 +88,6 @@ func apiCommonFlags() []cli.Flag {
 		&cli.UintFlag{
 			Name:  "port",
 			Usage: "Set port",
-			Value: uint(koios.DefaultPort),
 		},
 		&cli.StringFlag{
 			Name:  "host",
