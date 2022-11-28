@@ -17,7 +17,7 @@
 package main
 
 import (
-	"github.com/cardano-community/koios-go-client/v2"
+	"github.com/cardano-community/koios-go-client/v3"
 	"github.com/urfave/cli/v2"
 )
 
@@ -172,6 +172,12 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 					Usage:    "Only fetch information after specific block height",
 					Required: false,
 				},
+				&cli.BoolFlag{
+					Value:    true,
+					Name:     "history",
+					Usage:    "Include all historical transactions, setting to false includes only the non-empty ones",
+					Required: false,
+				},
 			},
 			Action: func(ctx *cli.Context) error {
 				res, err := api.GetAssetTxs(
@@ -179,6 +185,7 @@ func attachAPIAssetsCommmands(apicmd *cli.Command) {
 					koios.PolicyID(ctx.String("policy")),
 					koios.AssetName(ctx.String("name")),
 					ctx.Int("after-block-height"),
+					ctx.Bool("history"),
 					opts,
 				)
 				apiOutput(ctx, res, err)
