@@ -19,7 +19,7 @@ package main
 import (
 	"github.com/urfave/cli/v2"
 
-	"github.com/cardano-community/koios-go-client/v2"
+	"github.com/cardano-community/koios-go-client/v3"
 )
 
 var epochFlag = &cli.Uint64Flag{
@@ -40,8 +40,10 @@ func attachAPICommmand(app *cli.App) {
 				hostopt koios.Option
 				err     error
 			)
-			if c.Bool("testnet") {
-				hostopt = koios.Host(koios.TestnetHost)
+			if c.Bool("preview") {
+				hostopt = koios.Host(koios.PreviewHost)
+			} else if c.Bool("preprod") {
+				hostopt = koios.Host(koios.PreProdHost)
 			} else if c.Bool("guildnet") {
 				hostopt = koios.Host(koios.GuildHost)
 			} else {
@@ -123,8 +125,13 @@ func apiCommonFlags() []cli.Flag {
 			Value: false,
 		},
 		&cli.BoolFlag{
-			Name:  "testnet",
-			Usage: "use testnet host.",
+			Name:  "preview",
+			Usage: "use preview host.",
+			Value: false,
+		},
+		&cli.BoolFlag{
+			Name:  "preprod",
+			Usage: "use preprod host.",
 			Value: false,
 		},
 		&cli.BoolFlag{
