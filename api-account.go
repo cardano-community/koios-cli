@@ -17,7 +17,7 @@
 package main
 
 import (
-	"github.com/cardano-community/koios-go-client/v2"
+	"github.com/cardano-community/koios-go-client/v3"
 	"github.com/urfave/cli/v2"
 )
 
@@ -44,9 +44,15 @@ func attachAPIAccountCommmands(apicmd *cli.Command) {
 					Usage:    "Cardano payment address in bech32 format",
 					Required: true,
 				},
+				&cli.BoolFlag{
+					Value:    false,
+					Name:     "cached",
+					Usage:    "Get the cached account information for given stake addresses (accounts)",
+					Required: false,
+				},
 			},
 			Action: func(ctx *cli.Context) error {
-				res, err := api.GetAccountInfo(callctx, koios.Address(ctx.String("address")), opts)
+				res, err := api.GetAccountInfo(callctx, koios.Address(ctx.String("address")), ctx.Bool("cached"), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
