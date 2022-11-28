@@ -3,7 +3,7 @@ module github.com/cardano-community/koios-cli
 go 1.18
 
 require (
-	github.com/cardano-community/koios-go-client/v3 v3.1.0
+	github.com/cardano-community/koios-go-client/v3 v3.1.1
 	github.com/urfave/cli/v2 v2.23.5
 )
 
