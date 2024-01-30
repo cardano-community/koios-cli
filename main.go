@@ -17,7 +17,6 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -94,15 +93,15 @@ func handleErr(err error) {
 }
 
 // helper to print json response body.
-func printJSON(ctx *cli.Context, body []byte) {
-	if ctx.Bool("no-format") {
-		fmt.Println(string(body))
-		return
-	}
-	var pretty bytes.Buffer
-	handleErr(json.Indent(&pretty, body, "", "    "))
-	fmt.Println(pretty.String())
-}
+// func printJSON(ctx *cli.Context, body []byte) {
+// 	if ctx.Bool("no-format") {
+// 		fmt.Println(string(body))
+// 		return
+// 	}
+// 	var pretty bytes.Buffer
+// 	handleErr(json.Indent(&pretty, body, "", "    "))
+// 	fmt.Println(pretty.String())
+// }
 
 // output koios api client responses.
 func apiOutput(ctx *cli.Context, data interface{}, err error) {

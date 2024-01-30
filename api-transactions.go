@@ -21,8 +21,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cardano-community/koios-go-client/v3"
 	"github.com/urfave/cli/v2"
+
+	"github.com/cardano-community/koios-go-client/v3"
 )
 
 func attachAPITransactionsCommmands(apicmd *cli.Command) {

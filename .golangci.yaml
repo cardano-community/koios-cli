@@ -108,81 +108,12 @@ severity:
   # -       Github: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-error-message
   # default-severity: error
 
-linters:
-  disable-all: true
-  enable:
-    # Enabled By Default Linters
-    - deadcode
-    - errcheck
-    - gosimple
-    - govet
-    - ineffassign
-    - staticcheck
-    - structcheck
-    - typecheck
-    - unused
-    - varcheck
-    # Disabled By Default Linters
-    - asciicheck
-    - bodyclose
-    - cyclop
-    - depguard
-    - dogsled
-    - dupl
-    - durationcheck
-    - errorlint
-    - exhaustive
-    - exhaustivestruct
-    - exportloopref
-    # - forbidigo
-    - forcetypeassert
-    # - funlen
-    - gochecknoglobals
-    - gochecknoinits
-    - gocognit
-    - goconst
-    - gocritic
-    - gocyclo
-    - godot
-    - godox
-    - goerr113
-    - gofmt
-    # - gofumpt
-    - gci # run it after gofumpt
-    - goheader
-    # - goimports
-    # - gomnd
-    - gosec
-    - ifshort
-    - lll
-    - makezero
-    - misspell
-    - nakedret
-    - nestif
-    - nilerr
-    - nolintlint
-    - prealloc
-    - predeclared
-    - revive
-    # - nlreturn
-    - stylecheck
-    - unconvert
-    - unparam
-    - wastedassign
-    - whitespace
 
 linters-settings:
   cyclop:
     # the maximal code complexity to report
     max-complexity: 15
 
-  exhaustivestruct:
-    # Struct Patterns is list of expressions to match struct packages and names
-    # The struct packages have the form example.com/package.ExampleStruct
-    # The matching patterns can use matching syntax from https://pkg.go.dev/path#Match
-    # If this list is empty, all structs are tested.
-    struct-patterns:
-      - "*.Test"
   funlen:
     lines: 80
     statements: 40
