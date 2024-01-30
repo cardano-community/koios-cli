@@ -143,12 +143,7 @@ func attachAPIAccountCommmands(apicmd *cli.Command) {
 				},
 			},
 			Action: func(ctx *cli.Context) error {
-				var epoch *koios.EpochNo
-				if ctx.Uint("epoch") > 0 {
-					v := koios.EpochNo(ctx.Uint64("epoch"))
-					epoch = &v
-				}
-				res, err := api.GetAccountAssets(callctx, koios.Address(ctx.String("address")), epoch, opts)
+				res, err := api.GetAccountAssets(callctx, koios.Address(ctx.String("address")), opts)
 				apiOutput(ctx, res, err)
 				return nil
 			},
