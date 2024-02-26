@@ -59,8 +59,9 @@ func Command() *happy.Command {
 	api := &client{}
 	cmd.Before(api.configure)
 
+	// Network:
+	// https://api.koios.rest/#tag--Network
 	cmd.DescribeCategory("network", "Query information about the network")
-
 	cmd.AddSubCommand(api.cmdNetworkTip())
 	cmd.AddSubCommand(api.cmdNetworkGenesis())
 	cmd.AddSubCommand(api.cmdNetworkTotals())
@@ -68,6 +69,101 @@ func Command() *happy.Command {
 	cmd.AddSubCommand(api.cmdNetworkReserveWithdrawals())
 	cmd.AddSubCommand(api.cmdNetworkTreasuryWithdrawals())
 
+	// Epoch:
+	// https://api.koios.rest/#tag--Epoch
+	cmd.DescribeCategory("epoch", "Query epoch-specific details")
+	cmd.AddSubCommand(notimplCmd("epoch", "epoch_info"))
+	cmd.AddSubCommand(notimplCmd("epoch", "epoch_params"))
+	cmd.AddSubCommand(notimplCmd("epoch", "epoch_block_protocols"))
+
+	// Block:
+	// https://api.koios.rest/#tag--Block
+	cmd.DescribeCategory("block", "Query information about particular block on chain")
+	cmd.AddSubCommand(notimplCmd("block", "blocks"))
+	cmd.AddSubCommand(notimplCmd("block", "block_info"))
+	cmd.AddSubCommand(notimplCmd("block", "block_txs"))
+
+	// Transactions:
+	// https://api.koios.rest/#tag--Transactions
+	cmd.DescribeCategory("transactions", "Query blockchain transaction details")
+	cmd.AddSubCommand(notimplCmd("transactions", "utxo_info"))
+	cmd.AddSubCommand(notimplCmd("transactions", "tx_info"))
+	cmd.AddSubCommand(notimplCmd("transactions", "tx_metadata"))
+	cmd.AddSubCommand(notimplCmd("transactions", "tx_metalabels"))
+	cmd.AddSubCommand(notimplCmd("transactions", "submittx"))
+	cmd.AddSubCommand(notimplCmd("transactions", "tx_status"))
+	cmd.AddSubCommand(notimplCmd("transactions", "tx_utxos"))
+
+	// Stake Account:
+	// https://api.koios.rest/#tag--Stake-Account
+	cmd.DescribeCategory("stake account", "Query details about specific stake account addresses")
+	cmd.AddSubCommand(notimplCmd("stake account", "account_list"))
+	cmd.AddSubCommand(notimplCmd("stake account", "account_info"))
+	cmd.AddSubCommand(notimplCmd("stake account", "account_info_cached"))
+	cmd.AddSubCommand(notimplCmd("stake account", "account_utxos"))
+	cmd.AddSubCommand(notimplCmd("stake account", "account_txs"))
+	cmd.AddSubCommand(notimplCmd("stake account", "account_rewards"))
+	cmd.AddSubCommand(notimplCmd("stake account", "account_updates"))
+	cmd.AddSubCommand(notimplCmd("stake account", "account_addresses"))
+	cmd.AddSubCommand(notimplCmd("stake account", "account_assets"))
+	cmd.AddSubCommand(notimplCmd("stake account", "account_history"))
+
+	// Address:
+	// https://api.koios.rest/#tag--Address
+	cmd.DescribeCategory("address", "Query information about specific address(es)")
+	cmd.AddSubCommand(notimplCmd("address", "address_info"))
+	cmd.AddSubCommand(notimplCmd("address", "address_utxos"))
+	cmd.AddSubCommand(notimplCmd("address", "credential_utxos"))
+	cmd.AddSubCommand(notimplCmd("address", "address_txs"))
+	cmd.AddSubCommand(notimplCmd("address", "credential_txs"))
+	cmd.AddSubCommand(notimplCmd("address", "address_assets"))
+
+	// Asset:
+	// https://api.koios.rest/#tag--Asset
+	cmd.DescribeCategory("asset", "Query Asset related informations")
+	cmd.AddSubCommand(notimplCmd("asset", "asset_list"))
+	cmd.AddSubCommand(notimplCmd("asset", "policy_asset_list"))
+	cmd.AddSubCommand(notimplCmd("asset", "asset_token_registry"))
+	cmd.AddSubCommand(notimplCmd("asset", "asset_info"))
+	cmd.AddSubCommand(notimplCmd("asset", "asset_utxos"))
+	cmd.AddSubCommand(notimplCmd("asset", "asset_history"))
+	cmd.AddSubCommand(notimplCmd("asset", "asset_addresses"))
+	cmd.AddSubCommand(notimplCmd("asset", "asset_nft_address"))
+	cmd.AddSubCommand(notimplCmd("asset", "policy_asset_addresses"))
+	cmd.AddSubCommand(notimplCmd("asset", "policy_asset_info"))
+	cmd.AddSubCommand(notimplCmd("asset", "asset_summary"))
+	cmd.AddSubCommand(notimplCmd("asset", "asset_txs"))
+
+	// Pool:
+	// https://api.koios.rest/#tag--Pool
+	cmd.DescribeCategory("pool", "Query information about specific pools")
+	cmd.AddSubCommand(notimplCmd("pool", "pool_list"))
+	cmd.AddSubCommand(notimplCmd("pool", "pool_info"))
+	cmd.AddSubCommand(notimplCmd("pool", "pool_stake_snapshot"))
+	cmd.AddSubCommand(notimplCmd("pool", "pool_delegators"))
+	cmd.AddSubCommand(notimplCmd("pool", "pool_delegators_history"))
+	cmd.AddSubCommand(notimplCmd("pool", "pool_blocks"))
+	cmd.AddSubCommand(notimplCmd("pool", "pool_history"))
+	cmd.AddSubCommand(notimplCmd("pool", "pool_updates"))
+	cmd.AddSubCommand(notimplCmd("pool", "pool_registrations"))
+	cmd.AddSubCommand(notimplCmd("pool", "pool_retirements"))
+	cmd.AddSubCommand(notimplCmd("pool", "pool_relays"))
+	cmd.AddSubCommand(notimplCmd("pool", "pool_metadata"))
+
+	// Script:
+	// https://api.koios.rest/#tag--Script
+	cmd.DescribeCategory("script", "Query information about specific scripts (Smart Contracts)")
+	cmd.AddSubCommand(notimplCmd("script", "script_info"))
+	cmd.AddSubCommand(notimplCmd("script", "native_script_list"))
+	cmd.AddSubCommand(notimplCmd("script", "plutus_script_list"))
+	cmd.AddSubCommand(notimplCmd("script", "script_redeemers"))
+	cmd.AddSubCommand(notimplCmd("script", "script_utxos"))
+	cmd.AddSubCommand(notimplCmd("script", "datum_info"))
+
+	// Ogmios:
+	// https://api.koios.rest/#tag--Ogmios
+	cmd.DescribeCategory("ogmios", "Various stateless queries against Ogmios v6 instance")
+	cmd.AddSubCommand(notimplCmd("ogmios", "ogmios"))
 	return cmd
 }
 
