@@ -1,66 +1,45 @@
-// Copyright 2022 The Cardano Community Authors
 // SPDX-License-Identifier: Apache-2.0
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at:
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//   or LICENSE file in repository root.
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// Copyright © 2022 The Cardano Community Authors
 
-package main
+package api
 
-import (
-	"github.com/urfave/cli/v2"
+import "github.com/happy-sdk/happy"
 
-	"github.com/cardano-community/koios-go-client/v3"
-)
+const categoryScript = "script"
 
-func attachAPIScriptCommmands(apicmd *cli.Command) {
-	apicmd.Subcommands = append(apicmd.Subcommands, []*cli.Command{
-		{
-			Name:     "native-script-list",
-			Category: "SCRIPT",
-			Usage:    "List of all existing native script hashes along with their creation transaction hashes.",
-			Action: func(ctx *cli.Context) error {
-				res, err := api.GetNativeScripts(callctx, opts)
-				apiOutput(ctx, res, err)
-				return nil
-			},
-		},
-		{
-			Name:     "plutus-script-list",
-			Category: "SCRIPT",
-			Usage:    "List of all existing Plutus script hashes along with their creation transaction hashes.",
-			Action: func(ctx *cli.Context) error {
-				res, err := api.GetPlutusScripts(callctx, opts)
-				apiOutput(ctx, res, err)
-				return nil
-			},
-		},
-		{
-			Name:     "script-redeemers",
-			Category: "SCRIPT",
-			Usage:    "List of all redeemers for a given script hash.",
-			Flags: []cli.Flag{
-				&cli.StringFlag{
-					Name:     "script-hash",
-					Aliases:  []string{"s"},
-					Usage:    "Script hash in hexadecimal format (hex)",
-					Required: true,
-				},
-			},
-			Action: func(ctx *cli.Context) error {
-				res, err := api.GetScriptRedeemers(callctx, koios.ScriptHash(ctx.String("script-hash")), opts)
-				apiOutput(ctx, res, err)
-				return nil
-			},
-		},
-	}...)
+// Script:
+// https://api.koios.rest/#tag--Script
+func script(cmd *happy.Command, c *client) {
+	cmd.DescribeCategory(categoryScript, "Query information about specific scripts (Smart Contracts)")
+	cmd.AddSubCommand(cmdScriptScriptInfo(c))
+	cmd.AddSubCommand(cmdScriptNativeScriptList(c))
+	cmd.AddSubCommand(cmdScriptPlutusScriptList(c))
+	cmd.AddSubCommand(cmdScriptScriptRedeemers(c))
+	cmd.AddSubCommand(cmdScriptScriptUtxos(c))
+	cmd.AddSubCommand(cmdScriptDatumInfo(c))
+}
+
+func cmdScriptScriptInfo(c *client) *happy.Command {
+	return notimplCmd(categoryScript, "script_info")
+}
+
+func cmdScriptNativeScriptList(c *client) *happy.Command {
+	return notimplCmd(categoryScript, "native_script_list")
+}
+
+func cmdScriptPlutusScriptList(c *client) *happy.Command {
+	return notimplCmd(categoryScript, "plutus_script_list")
+}
+
+func cmdScriptScriptRedeemers(c *client) *happy.Command {
+	return notimplCmd(categoryScript, "script_redeemers")
+}
+
+func cmdScriptScriptUtxos(c *client) *happy.Command {
+	return notimplCmd(categoryScript, "script_utxos")
+}
+
+func cmdScriptDatumInfo(c *client) *happy.Command {
+	return notimplCmd(categoryScript, "datum_info")
 }
