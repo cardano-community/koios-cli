@@ -53,7 +53,7 @@ func Command() *happy.Command {
 	cmd := happy.NewCommand("api",
 		happy.Option("description", "Interact with Koios API REST endpoints"),
 		happy.Option("before.shared", true),
-		happy.Option("category", "API"),
+		// happy.Option("category", "API"), // enable when more subcommands are implemented
 	).WithFalgs(
 		clientSharedFlags...,
 	)
