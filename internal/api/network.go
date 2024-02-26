@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright © 2024 The Cardano Community Authors
+// Copyright © 2022 The Cardano Community Authors
 
 package api
 
@@ -11,10 +11,24 @@ import (
 	"github.com/happy-sdk/happy"
 )
 
-func (c *client) cmdNetworkTip() *happy.Command {
+const categoryNetwork = "network"
+
+// Network:
+// https://api.koios.rest/#tag--Network
+func network(cmd *happy.Command, c *client) {
+	cmd.DescribeCategory(categoryNetwork, "Query information about the network")
+	cmd.AddSubCommand(cmdNetworkTip(c))
+	cmd.AddSubCommand(cmdNetworkGenesis(c))
+	cmd.AddSubCommand(cmdNetworkTotals(c))
+	cmd.AddSubCommand(cmdNetworkParamUpdates(c))
+	cmd.AddSubCommand(cmdNetworkReserveWithdrawals(c))
+	cmd.AddSubCommand(cmdNetworkTreasuryWithdrawals(c))
+}
+
+func cmdNetworkTip(c *client) *happy.Command {
 	cmd := happy.NewCommand("tip",
 		happy.Option("description", "Query Chain Tip"),
-		happy.Option("category", "network"),
+		happy.Option("category", categoryNetwork),
 	).WithFalgs(queryFlag)
 	cmd.AddInfo("Get the tip info about the latest block seen by chain")
 	cmd.AddInfo(`
@@ -52,7 +66,7 @@ func (c *client) cmdNetworkTip() *happy.Command {
 			return err
 		}
 
-		res, err := c.kc.GetTip(sess, opts)
+		res, err := c.koios().GetTip(sess, opts)
 		apiOutput(c.noFormat, res, err)
 		return nil
 	})
@@ -60,10 +74,10 @@ func (c *client) cmdNetworkTip() *happy.Command {
 	return cmd
 }
 
-func (c *client) cmdNetworkGenesis() *happy.Command {
+func cmdNetworkGenesis(c *client) *happy.Command {
 	cmd := happy.NewCommand("genesis",
 		happy.Option("description", "Get Genesis info"),
-		happy.Option("category", "network"),
+		happy.Option("category", categoryNetwork),
 	).WithFalgs(queryFlag)
 	cmd.AddInfo("Get the Genesis parameters used to start specific era on chain")
 	cmd.AddInfo(`
@@ -94,7 +108,7 @@ func (c *client) cmdNetworkGenesis() *happy.Command {
 			return err
 		}
 
-		res, err := c.kc.GetGenesis(sess, opts)
+		res, err := c.koios().GetGenesis(sess, opts)
 		apiOutput(c.noFormat, res, err)
 		return nil
 	})
@@ -102,10 +116,10 @@ func (c *client) cmdNetworkGenesis() *happy.Command {
 	return cmd
 }
 
-func (c *client) cmdNetworkTotals() *happy.Command {
+func cmdNetworkTotals(c *client) *happy.Command {
 	cmd := happy.NewCommand("totals",
 		happy.Option("description", "Get historical tokenomic stats for the network."),
-		happy.Option("category", "network"),
+		happy.Option("category", categoryNetwork),
 	).WithFalgs(
 		slices.Concat(clientPagingFlags, flagSlice(epochFlag))...,
 	)
@@ -146,7 +160,7 @@ func (c *client) cmdNetworkTotals() *happy.Command {
 		if err != nil {
 			return err
 		}
-		res, err := c.kc.GetTotals(sess, epoch, opts)
+		res, err := c.koios().GetTotals(sess, epoch, opts)
 		apiOutput(c.noFormat, res, err)
 		return nil
 	})
@@ -154,10 +168,10 @@ func (c *client) cmdNetworkTotals() *happy.Command {
 	return cmd
 }
 
-func (c *client) cmdNetworkParamUpdates() *happy.Command {
+func cmdNetworkParamUpdates(c *client) *happy.Command {
 	cmd := happy.NewCommand("param_updates",
 		happy.Option("description", "Param Update Proposals"),
-		happy.Option("category", "network"),
+		happy.Option("category", categoryNetwork),
 	).WithFalgs(
 		slices.Concat(clientPagingFlags, flagSlice(queryFlag))...,
 	)
@@ -177,7 +191,7 @@ func (c *client) cmdNetworkParamUpdates() *happy.Command {
 			return err
 		}
 
-		res, err := c.kc.GetParamUpdates(sess, opts)
+		res, err := c.koios().GetParamUpdates(sess, opts)
 		apiOutput(c.noFormat, res, err)
 		return nil
 	})
@@ -185,10 +199,10 @@ func (c *client) cmdNetworkParamUpdates() *happy.Command {
 	return cmd
 }
 
-func (c *client) cmdNetworkReserveWithdrawals() *happy.Command {
+func cmdNetworkReserveWithdrawals(c *client) *happy.Command {
 	cmd := happy.NewCommand("reserve_withdrawals",
 		happy.Option("description", "Reserve Withdrawals"),
-		happy.Option("category", "network"),
+		happy.Option("category", categoryNetwork),
 	).WithFalgs(
 		slices.Concat(clientPagingFlags, flagSlice(queryFlag))...,
 	)
@@ -206,7 +220,7 @@ func (c *client) cmdNetworkReserveWithdrawals() *happy.Command {
 		if err != nil {
 			return err
 		}
-		res, err := c.kc.GetReserveWithdrawals(sess, opts)
+		res, err := c.koios().GetReserveWithdrawals(sess, opts)
 		apiOutput(c.noFormat, res, err)
 		return nil
 	})
@@ -214,10 +228,10 @@ func (c *client) cmdNetworkReserveWithdrawals() *happy.Command {
 	return cmd
 }
 
-func (c *client) cmdNetworkTreasuryWithdrawals() *happy.Command {
+func cmdNetworkTreasuryWithdrawals(c *client) *happy.Command {
 	cmd := happy.NewCommand("treasury_withdrawals",
 		happy.Option("description", "Treasury Withdrawals"),
-		happy.Option("category", "network"),
+		happy.Option("category", categoryNetwork),
 	).WithFalgs(
 		slices.Concat(clientPagingFlags, flagSlice(queryFlag))...,
 	)
@@ -235,7 +249,7 @@ func (c *client) cmdNetworkTreasuryWithdrawals() *happy.Command {
 		if err != nil {
 			return err
 		}
-		res, err := c.kc.GetTreasuryWithdrawals(sess, opts)
+		res, err := c.koios().GetTreasuryWithdrawals(sess, opts)
 		apiOutput(c.noFormat, res, err)
 		return nil
 	})
