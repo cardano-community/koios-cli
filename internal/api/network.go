@@ -118,7 +118,7 @@ func cmdNetworkGenesis(c *client) *happy.Command {
 
 func cmdNetworkTotals(c *client) *happy.Command {
 	cmd := happy.NewCommand("totals",
-		happy.Option("description", "Get historical tokenomic stats for the network."),
+		happy.Option("description", "Get historical tokenomic stats"),
 		happy.Option("category", categoryNetwork),
 	).WithFalgs(
 		slices.Concat(clientPagingFlags, flagSlice(epochFlag))...,
