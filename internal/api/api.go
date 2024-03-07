@@ -16,31 +16,18 @@ import (
 	"github.com/happy-sdk/happy/pkg/vars/varflag"
 )
 
-const defaultOrigin = "https://github.com/cardano-community/koios-cli@v4"
+const defaultOrigin = "https://github.com/cardano-community/koios-cli/v2"
 
 var (
-	clientSharedFlags = []varflag.FlagCreateFunc{
-		varflag.UintFunc("port", uint(koios.DefaultPort), "Set port number for the API server"),
-		varflag.StringFunc("scheme", koios.DefaultScheme, "Set scheme for the API server"),
-		varflag.StringFunc("api-version", koios.DefaultAPIVersion, "Set API version"),
-		varflag.IntFunc("rate-limit", koios.DefaultRateLimit, "Set rate limit for the API server"),
-		varflag.StringFunc("origin", defaultOrigin, "Set origin for the API server"),
-		varflag.StringFunc("host", koios.MainnetHost, "Set host for the API server"),
-		varflag.BoolFunc("host-eu", false, "Use eu mainet network host"),
-		varflag.BoolFunc("host-preview", false, "Use preview network host"),
-		varflag.BoolFunc("host-preprod", false, "Use preprod network host"),
-		varflag.BoolFunc("host-guildnet", false, "Use guildnet network host"),
-		varflag.BoolFunc("enable-req-stats", false, "Enable request stats"),
-		varflag.BoolFunc("no-format", false, "prints response as machine readable json string"),
-	}
-
-	clientPagingFlags = []varflag.FlagCreateFunc{
+	pagingFlags = []varflag.FlagCreateFunc{
 		varflag.UintFunc("page", 1, "Set page number for paginated response"),
 		varflag.UintFunc("page-size", koios.PageSize, "Set page size for paginated response"),
 	}
 
-	queryFlag = varflag.StringFunc("query", "", "Custom query paramaetrs for the request. e.g. key1=value1&key2=value2")
-	epochFlag = varflag.UintFunc("epoch", 320, "Set epoch number")
+	queryFlag = varflag.StringFunc("query", "", "Custom query for the request. e.g. key1=value1&key2=value2")
+
+	// koios api params
+	epochNoFlag = varflag.UintFunc("epoch", 320, "Set epoch number")
 )
 
 type client struct {
@@ -55,7 +42,18 @@ func Command() *happy.Command {
 		happy.Option("before.shared", true),
 		// happy.Option("category", "API"), // enable when more subcommands are implemented
 	).WithFalgs(
-		clientSharedFlags...,
+		varflag.UintFunc("port", uint(koios.DefaultPort), "Set port number for the API server"),
+		varflag.StringFunc("scheme", koios.DefaultScheme, "Set scheme for the API server"),
+		varflag.StringFunc("api-version", koios.DefaultAPIVersion, "Set API version"),
+		varflag.IntFunc("rate-limit", koios.DefaultRateLimit, "Set rate limit for the API server"),
+		varflag.StringFunc("origin", defaultOrigin, "Set origin for the API server"),
+		varflag.StringFunc("host", koios.MainnetHost, "Set host for the API server"),
+		varflag.BoolFunc("host-eu", false, "Use eu mainet network host"),
+		varflag.BoolFunc("host-preview", false, "Use preview network host"),
+		varflag.BoolFunc("host-preprod", false, "Use preprod network host"),
+		varflag.BoolFunc("host-guildnet", false, "Use guildnet network host"),
+		varflag.BoolFunc("enable-req-stats", false, "Enable request stats"),
+		varflag.BoolFunc("no-format", false, "prints response as machine readable json string"),
 	)
 
 	api := &client{}

@@ -121,7 +121,7 @@ func cmdNetworkTotals(c *client) *happy.Command {
 		happy.Option("description", "Get historical tokenomic stats"),
 		happy.Option("category", categoryNetwork),
 	).WithFalgs(
-		slices.Concat(clientPagingFlags, flagSlice(epochFlag))...,
+		slices.Concat(pagingFlags, flagSlice(epochNoFlag))...,
 	)
 	cmd.AddInfo(`
   Get the circulating utxo, treasury rewards, supply and reserves in lovelace
@@ -173,7 +173,7 @@ func cmdNetworkParamUpdates(c *client) *happy.Command {
 		happy.Option("description", "Param Update Proposals"),
 		happy.Option("category", categoryNetwork),
 	).WithFalgs(
-		slices.Concat(clientPagingFlags, flagSlice(queryFlag))...,
+		slices.Concat(pagingFlags, flagSlice(queryFlag))...,
 	)
 	cmd.AddInfo("Get all parameter update proposals submitted to the chain starting Shelley era")
 	cmd.AddInfo(`
@@ -204,7 +204,7 @@ func cmdNetworkReserveWithdrawals(c *client) *happy.Command {
 		happy.Option("description", "Reserve Withdrawals"),
 		happy.Option("category", categoryNetwork),
 	).WithFalgs(
-		slices.Concat(clientPagingFlags, flagSlice(queryFlag))...,
+		slices.Concat(pagingFlags, flagSlice(queryFlag))...,
 	)
 	cmd.AddInfo("List of all withdrawals from reserves against stake accounts")
 	cmd.AddInfo(`
@@ -233,7 +233,7 @@ func cmdNetworkTreasuryWithdrawals(c *client) *happy.Command {
 		happy.Option("description", "Treasury Withdrawals"),
 		happy.Option("category", categoryNetwork),
 	).WithFalgs(
-		slices.Concat(clientPagingFlags, flagSlice(queryFlag))...,
+		slices.Concat(pagingFlags, flagSlice(queryFlag))...,
 	)
 	cmd.AddInfo("List of all withdrawals from treasury against stake accounts")
 	cmd.AddInfo(`
