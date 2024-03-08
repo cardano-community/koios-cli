@@ -31,26 +31,33 @@ func cmdAddressAddressInfo(c *client) *happy.Command {
 	cmd := happy.NewCommand("address_info",
 		happy.Option("description", "Address Information"),
 		happy.Option("category", categoryAddress),
+		happy.Option("argn.max", 100),
+		happy.Option("usage", "koios api address_info [_addresses...] // max 100"),
 	).WithFalgs(queryFlag)
 	cmd.AddInfo("Get address info - balance, associated stake address (if any) and UTxO set for given addresses")
 	cmd.AddInfo(`
-  Docs: https://api.koios.rest/#post-/address_info`)
+  Docs: https://api.koios.rest/#post-/address_info
 
-	cmd.AddFlag(varflag.StringFunc("addresses", "", "Comma separated list of addresses to query", "a"))
+  _addresses query parameter is constructed from command line arguments,
+
+  Example: koios-cli api address_info \
+    addr1qy2jt0qpqz2z2z9zx5w4xemekkce7yderz53kjue53lpqv90lkfa9sgrfjuz6uvt4uqtrqhl2kj0a9lnr9ndzutx32gqleeckv \
+    addr1q9xvgr4ehvu5k5tmaly7ugpnvekpqvnxj8xy50pa7kyetlnhel389pa4rnq6fmkzwsaynmw0mnldhlmchn2sfd589fgsz9dd0y
+
+  `)
+
 	cmd.Do(func(sess *happy.Session, args happy.Args) error {
-		if !args.Flag("addresses").Present() {
-			return fmt.Errorf("missing required flag: addresses")
+		if args.Argn() == 0 {
+			return fmt.Errorf("atleast one address required")
 		}
-
-		addrs := strings.Split(args.Flag("addresses").String(), ",")
 
 		opts, err := c.newRequestOpts(sess, args)
 		if err != nil {
 			return err
 		}
 		var addresses []koios.Address
-		for _, addr := range addrs {
-			addresses = append(addresses, koios.Address(addr))
+		for _, addr := range args.Args() {
+			addresses = append(addresses, koios.Address(addr.String()))
 		}
 		res, err := c.koios().GetAddressesInfo(sess, addresses, opts)
 		apiOutput(c.noFormat, res, err)
