@@ -127,6 +127,9 @@ func (c *client) koios() *koios.Client {
 
 func (c *client) newRequestOpts(sess *happy.Session, args happy.Args) (*koios.RequestOptions, error) {
 	opts := c.koios().NewRequestOptions()
+	if args == nil {
+		return opts, nil
+	}
 	if args.Flag("page").Present() {
 		opts.SetCurrentPage(args.Flag("page").Var().Uint())
 	}

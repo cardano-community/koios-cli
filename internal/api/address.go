@@ -5,10 +5,9 @@
 package api
 
 import (
-	"fmt"
-
 	"github.com/cardano-community/koios-go-client/v4"
 	"github.com/happy-sdk/happy"
+	"github.com/happy-sdk/happy/pkg/vars/varflag"
 )
 
 const categoryAddress = "address"
@@ -45,10 +44,6 @@ func cmdAddressAddressInfo(c *client) *happy.Command {
   `)
 
 	cmd.Do(func(sess *happy.Session, args happy.Args) error {
-		if args.Argn() == 0 {
-			return fmt.Errorf("atleast one address required")
-		}
-
 		opts, err := c.newRequestOpts(sess, args)
 		if err != nil {
 			return err
@@ -65,28 +60,13 @@ func cmdAddressAddressInfo(c *client) *happy.Command {
 	return cmd
 }
 
-func cmdAddressAddressUtxos(c *client) *happy.Command {
-	return notimplCmd(categoryAddress, "address_utxos")
-}
-
-func cmdAddressCredentialUtxos(c *client) *happy.Command {
-	return notimplCmd(categoryAddress, "credential_utxos")
-}
-
-func cmdAddressAddressTxs(c *client) *happy.Command {
-	return notimplCmd(categoryAddress, "address_txs")
-}
-
-func cmdAddressCredentialTxs(c *client) *happy.Command {
-	return notimplCmd(categoryAddress, "credential_txs")
-}
-
 func cmdAddressAddressAssets(c *client) *happy.Command {
 	cmd := happy.NewCommand("address_assets",
 		happy.Option("description", "Address Assets"),
 		happy.Option("category", categoryAddress),
-		happy.Option("argn.max", 100),
-		happy.Option("usage", "koios api address_assets [_addresses...] // max 100"),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api address_assets [addresses...] // max 50"),
 	).WithFalgs(queryFlag)
 	cmd.AddInfo("Get the list of all the assets (policy, name and quantity) for given addresses")
 	cmd.AddInfo(`
@@ -101,10 +81,6 @@ Example: koios-cli api address_assets \
 `)
 
 	cmd.Do(func(sess *happy.Session, args happy.Args) error {
-		if args.Argn() == 0 {
-			return fmt.Errorf("atleast one address required")
-		}
-
 		opts, err := c.newRequestOpts(sess, args)
 		if err != nil {
 			return err
@@ -119,4 +95,59 @@ Example: koios-cli api address_assets \
 	})
 
 	return cmd
+}
+
+func cmdAddressAddressTxs(c *client) *happy.Command {
+	cmd := happy.NewCommand("address_txs",
+		happy.Option("description", "Address Transactions"),
+		happy.Option("category", categoryAddress),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api address_txs --after-block-height 9945516 [addresses...] // max 50"),
+	)
+	cmd.AddInfo("Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive)")
+	cmd.AddInfo(`
+Docs:https://api.koios.rest/#post-/address_txs
+
+_addresses query parameter is constructed from command line arguments,
+
+Example: koios-cli api address_txs \
+  --after-block-height 8000000 \
+  addr1qy2jt0qpqz2z2z9zx5w4xemekkce7yderz53kjue53lpqv90lkfa9sgrfjuz6uvt4uqtrqhl2kj0a9lnr9ndzutx32gqleeckv \
+  addr1q9xvgr4ehvu5k5tmaly7ugpnvekpqvnxj8xy50pa7kyetlnhel389pa4rnq6fmkzwsaynmw0mnldhlmchn2sfd589fgsz9dd0y
+
+`).WithFalgs(varflag.UintFunc("after-block-height", 0, "Only fetch information after specific block height"))
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+		var addresses []koios.Address
+		for _, addr := range args.Args() {
+			addresses = append(addresses, koios.Address(addr.String()))
+		}
+		var afterBlockHeight uint64
+		if args.Flag("after-block-height").Present() {
+			afterBlockHeight = args.Flag("after-block-height").Var().Uint64()
+		}
+
+		res, err := c.koios().GetAddressTxs(sess, addresses, afterBlockHeight, opts)
+		apiOutput(c.noFormat, res, err)
+		return nil
+	})
+
+	return cmd
+}
+
+func cmdAddressAddressUtxos(c *client) *happy.Command {
+	return notimplCmd(categoryAddress, "address_utxos")
+}
+
+func cmdAddressCredentialTxs(c *client) *happy.Command {
+	return notimplCmd(categoryAddress, "credential_txs")
+}
+
+func cmdAddressCredentialUtxos(c *client) *happy.Command {
+	return notimplCmd(categoryAddress, "credential_utxos")
 }
