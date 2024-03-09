@@ -15,6 +15,7 @@ func main() {
 	logOpts := logging.ConsoleDefaultOptions()
 	logOpts.Level = logging.LevelOk
 	logOpts.AddSource = false
+
 	app := happy.New(happy.Settings{
 		Name:           "KOIOS CLI",
 		Slug:           "koios",
@@ -26,9 +27,8 @@ func main() {
 		StatsEnabled:   false,
 	}).
 		WithLogger(logging.Console(logOpts)).
-		WithBrand(koios.Brand())
-
-	app.WithCommand(api.Command())
+		WithBrand(koios.Brand()).
+		WithCommand(api.Command())
 
 	app.Run()
 }
