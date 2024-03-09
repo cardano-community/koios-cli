@@ -35,7 +35,7 @@ func cmdAddressAddressInfo(c *client) *happy.Command {
 	cmd.AddInfo(`
   Docs: https://api.koios.rest/#post-/address_info
 
-  _addresses query parameter is constructed from command line arguments,
+  _addresses is constructed from command line arguments,
 
   Example: koios-cli api address_info \
     addr1qy2jt0qpqz2z2z9zx5w4xemekkce7yderz53kjue53lpqv90lkfa9sgrfjuz6uvt4uqtrqhl2kj0a9lnr9ndzutx32gqleeckv \
@@ -70,15 +70,15 @@ func cmdAddressAddressAssets(c *client) *happy.Command {
 	).WithFalgs(queryFlag)
 	cmd.AddInfo("Get the list of all the assets (policy, name and quantity) for given addresses")
 	cmd.AddInfo(`
-Docs: https://api.koios.rest/#post-/address_assets
+  Docs: https://api.koios.rest/#post-/address_assets
 
-_addresses query parameter is constructed from command line arguments,
+  _addresses is constructed from command line arguments,
 
-Example: koios-cli api address_assets \
-  addr1qy2jt0qpqz2z2z9zx5w4xemekkce7yderz53kjue53lpqv90lkfa9sgrfjuz6uvt4uqtrqhl2kj0a9lnr9ndzutx32gqleeckv \
-  addr1q9xvgr4ehvu5k5tmaly7ugpnvekpqvnxj8xy50pa7kyetlnhel389pa4rnq6fmkzwsaynmw0mnldhlmchn2sfd589fgsz9dd0y
+  Example: koios-cli api address_assets \
+    addr1qy2jt0qpqz2z2z9zx5w4xemekkce7yderz53kjue53lpqv90lkfa9sgrfjuz6uvt4uqtrqhl2kj0a9lnr9ndzutx32gqleeckv \
+    addr1q9xvgr4ehvu5k5tmaly7ugpnvekpqvnxj8xy50pa7kyetlnhel389pa4rnq6fmkzwsaynmw0mnldhlmchn2sfd589fgsz9dd0y
 
-`)
+  `)
 
 	cmd.Do(func(sess *happy.Session, args happy.Args) error {
 		opts, err := c.newRequestOpts(sess, args)
@@ -109,16 +109,16 @@ func cmdAddressAddressTxs(c *client) *happy.Command {
 
 	cmd.AddInfo("Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive)")
 	cmd.AddInfo(`
-Docs:https://api.koios.rest/#post-/address_txs
+  Docs:https://api.koios.rest/#post-/address_txs
 
-_addresses query parameter is constructed from command line arguments,
+  _addresses is constructed from command line arguments,
 
-Example: koios-cli api address_txs \
-  --after-block-height 8000000 \
-  addr1qy2jt0qpqz2z2z9zx5w4xemekkce7yderz53kjue53lpqv90lkfa9sgrfjuz6uvt4uqtrqhl2kj0a9lnr9ndzutx32gqleeckv \
-  addr1q9xvgr4ehvu5k5tmaly7ugpnvekpqvnxj8xy50pa7kyetlnhel389pa4rnq6fmkzwsaynmw0mnldhlmchn2sfd589fgsz9dd0y
+  Example: koios-cli api address_txs \
+    --after-block-height 8000000 \
+    addr1qy2jt0qpqz2z2z9zx5w4xemekkce7yderz53kjue53lpqv90lkfa9sgrfjuz6uvt4uqtrqhl2kj0a9lnr9ndzutx32gqleeckv \
+    addr1q9xvgr4ehvu5k5tmaly7ugpnvekpqvnxj8xy50pa7kyetlnhel389pa4rnq6fmkzwsaynmw0mnldhlmchn2sfd589fgsz9dd0y
 
-`)
+  `)
 
 	cmd.Do(func(sess *happy.Session, args happy.Args) error {
 		opts, err := c.newRequestOpts(sess, args)
@@ -129,12 +129,8 @@ Example: koios-cli api address_txs \
 		for _, addr := range args.Args() {
 			addresses = append(addresses, koios.Address(addr.String()))
 		}
-		var afterBlockHeight uint64
-		if args.Flag("after-block-height").Present() {
-			afterBlockHeight = args.Flag("after-block-height").Var().Uint64()
-		}
 
-		res, err := c.koios().GetAddressTxs(sess, addresses, afterBlockHeight, opts)
+		res, err := c.koios().GetAddressTxs(sess, addresses, args.Flag("after-block-height").Var().Uint64(), opts)
 		apiOutput(c.noFormat, res, err)
 		return nil
 	})
@@ -154,16 +150,16 @@ func cmdAddressAddressUtxos(c *client) *happy.Command {
 
 	cmd.AddInfo("Get the UTxO set for given addresses")
 	cmd.AddInfo(`
-Docs: https://api.koios.rest/#post-/address_utxos
+  Docs: https://api.koios.rest/#post-/address_utxos
 
-_addresses query parameter is constructed from command line arguments,
+  _addresses constructed from command line arguments,
 
-Example: koios-cli api address_utxos \
-  --extended \
-  addr1qy2jt0qpqz2z2z9zx5w4xemekkce7yderz53kjue53lpqv90lkfa9sgrfjuz6uvt4uqtrqhl2kj0a9lnr9ndzutx32gqleeckv \
-  addr1q9xvgr4ehvu5k5tmaly7ugpnvekpqvnxj8xy50pa7kyetlnhel389pa4rnq6fmkzwsaynmw0mnldhlmchn2sfd589fgsz9dd0y
+  Example: koios-cli api address_utxos \
+    --extended \
+    addr1qy2jt0qpqz2z2z9zx5w4xemekkce7yderz53kjue53lpqv90lkfa9sgrfjuz6uvt4uqtrqhl2kj0a9lnr9ndzutx32gqleeckv \
+    addr1q9xvgr4ehvu5k5tmaly7ugpnvekpqvnxj8xy50pa7kyetlnhel389pa4rnq6fmkzwsaynmw0mnldhlmchn2sfd589fgsz9dd0y
 
-  `)
+    `)
 
 	cmd.Do(func(sess *happy.Session, args happy.Args) error {
 		opts, err := c.newRequestOpts(sess, args)
@@ -184,7 +180,43 @@ Example: koios-cli api address_utxos \
 }
 
 func cmdAddressCredentialTxs(c *client) *happy.Command {
-	return notimplCmd(categoryAddress, "credential_txs")
+	cmd := happy.NewCommand("credential_txs",
+		happy.Option("description", "Transactions from payment credentials"),
+		happy.Option("category", categoryAddress),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api credential_txs --after-block-height 6238675 [credentials...] // max 50"),
+	).
+		WithFalgs(varflag.UintFunc("after-block-height", 0, "Only fetch information after specific block height (inclusive)"))
+
+	cmd.AddInfo("Get the transaction hash list of input payment credential array, optionally filtering after specified block height (inclusive)")
+
+	cmd.AddInfo(`
+  Docs: https://api.koios.rest/#post-/credential_txs
+
+  _payment_credentials parameter is constructed from command line arguments,
+
+  Example: koios-cli api credential_txs \
+    --after-block-height 6238675 \
+    025b0a8f85cb8a46e1dda3fae5d22f07e2d56abb4019a2129c5d6c52 \
+    13f6870c5e4f3b242463e4dc1f2f56b02a032d3797d933816f15e555
+
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return nil
+		}
+		var credentials []koios.PaymentCredential
+		for _, cred := range args.Args() {
+			credentials = append(credentials, koios.PaymentCredential(cred.String()))
+		}
+		res, err := c.koios().GetCredentialTxs(sess, credentials, args.Flag("after-block-height").Var().Uint64(), opts)
+		apiOutput(c.noFormat, res, err)
+		return nil
+	})
+	return cmd
 }
 
 func cmdAddressCredentialUtxos(c *client) *happy.Command {
