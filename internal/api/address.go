@@ -220,5 +220,42 @@ func cmdAddressCredentialTxs(c *client) *happy.Command {
 }
 
 func cmdAddressCredentialUtxos(c *client) *happy.Command {
-	return notimplCmd(categoryAddress, "credential_utxos")
+	cmd := happy.NewCommand("credential_utxos",
+		happy.Option("description", "UTxOs from payment credentials"),
+		happy.Option("category", categoryAddress),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api credential_utxos [credentials...] // max 50"),
+	).
+		WithFalgs(varflag.BoolFunc("extended", false, "Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call", "e"))
+
+	cmd.AddInfo("Get UTxO details for requested payment credentials")
+
+	cmd.AddInfo(`
+  Docs: https://api.koios.rest/#post-/credential_utxos
+
+  _payment_credentials parameter is constructed from command line arguments,
+
+  Example: koios-cli api credential_utxos \
+    --extended \
+    025b0a8f85cb8a46e1dda3fae5d22f07e2d56abb4019a2129c5d6c52 \
+    13f6870c5e4f3b242463e4dc1f2f56b02a032d3797d933816f15e555
+
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return nil
+		}
+		var credentials []koios.PaymentCredential
+		for _, cred := range args.Args() {
+			credentials = append(credentials, koios.PaymentCredential(cred.String()))
+		}
+		res, err := c.koios().GetCredentialUTxOs(sess, credentials, args.Flag("extended").Var().Bool(), opts)
+		apiOutput(c.noFormat, res, err)
+		return nil
+	})
+
+	return cmd
 }
