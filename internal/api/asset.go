@@ -4,7 +4,10 @@
 
 package api
 
-import "github.com/happy-sdk/happy"
+import (
+	"github.com/cardano-community/koios-go-client/v4"
+	"github.com/happy-sdk/happy"
+)
 
 const categoryAsset = "asset"
 
@@ -46,7 +49,7 @@ func cmdAssetList(c *client) *happy.Command {
 	).WithFalgs(pagingFlags...)
 	cmd.AddInfo("Get the list of all native assets (paginated)")
 	cmd.AddInfo(`
-  Docs: https://api.koios.rest/#get-/asset
+  Docs: https://api.koios.rest/#get-/asset_list
 
   Example: koios-cli api asset asset_list
     {
@@ -104,5 +107,29 @@ func cmdAssetPolicyAssetInfo(c *client) *happy.Command {
 }
 
 func cmdAssetPolicyAssetList(c *client) *happy.Command {
-	return notimplCmd(categoryAsset, "policy_asset_list")
+	cmd := happy.NewCommand("policy_asset_list",
+		happy.Option("description", "Policy Asset List"),
+		happy.Option("category", categoryAsset),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 1),
+		happy.Option("usage", "koios api asset policy_asset_list [policy_id]"),
+	).WithFalgs(pagingFlags...)
+	cmd.AddInfo("Get the list of all assets minted under a given policy (paginated)")
+	cmd.AddInfo(`
+  Docs: https://api.koios.rest/#get-/policy_asset_list
+
+  Example: koios-cli api asset policy_asset_list 750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return nil
+		}
+		res, err := c.koios().GetPolicyAssetList(sess, koios.PolicyID(args.Arg(0).String()), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
