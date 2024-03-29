@@ -51,7 +51,7 @@ func cmdAssetList(c *client) *happy.Command {
 	cmd.AddInfo(`
   Docs: https://api.koios.rest/#get-/asset_list
 
-  Example: koios-cli api asset asset_list
+  Example: koios-cli api asset_list
     {
       ...
       "data": [
@@ -87,7 +87,28 @@ func cmdAssetSummary(c *client) *happy.Command {
 }
 
 func cmdAssetTokenRegistry(c *client) *happy.Command {
-	return notimplCmd(categoryAsset, "asset_token_registry")
+	cmd := happy.NewCommand("asset_token_registry",
+		happy.Option("description", "Asset Token Registry"),
+		happy.Option("category", categoryAsset),
+	).WithFalgs(pagingFlags...)
+	cmd.AddInfo("Get a list of assets registered via token registry on github")
+	cmd.AddInfo(`
+  Docs: https://api.koios.rest/#get-/asset_token_registry
+
+  Example: koios-cli api asset_token_registry
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+		res, err := c.koios().GetAssetTokenRegistry(sess, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdAssetTxs(c *client) *happy.Command {
@@ -112,13 +133,13 @@ func cmdAssetPolicyAssetList(c *client) *happy.Command {
 		happy.Option("category", categoryAsset),
 		happy.Option("argn.min", 1),
 		happy.Option("argn.max", 1),
-		happy.Option("usage", "koios api asset policy_asset_list [policy_id]"),
+		happy.Option("usage", "koios api policy_asset_list [policy_id]"),
 	).WithFalgs(pagingFlags...)
 	cmd.AddInfo("Get the list of all assets minted under a given policy (paginated)")
 	cmd.AddInfo(`
   Docs: https://api.koios.rest/#get-/policy_asset_list
 
-  Example: koios-cli api asset policy_asset_list 750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501
+  Example: koios-cli api policy_asset_list 750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501
   `)
 
 	cmd.Do(func(sess *happy.Session, args happy.Args) error {
