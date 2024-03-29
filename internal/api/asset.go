@@ -295,7 +295,7 @@ func cmdAssetPolicyAssetAddresses(c *client) *happy.Command {
 		if err != nil {
 			return err
 		}
-		res, err := c.koios().GetAssetPolicyAddresses(sess, koios.PolicyID(args.Arg(0).String()), opts)
+		res, err := c.koios().GetPolicyAssetAddresses(sess, koios.PolicyID(args.Arg(0).String()), opts)
 		apiOutput(c.noFormat, res, err)
 		return err
 	})
@@ -304,7 +304,33 @@ func cmdAssetPolicyAssetAddresses(c *client) *happy.Command {
 }
 
 func cmdAssetPolicyAssetInfo(c *client) *happy.Command {
-	return notimplCmd(categoryAsset, "policy_asset_info")
+	cmd := happy.NewCommand("policy_asset_info",
+		happy.Option("description", "Policy Asset Information"),
+		happy.Option("category", categoryAsset),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 1),
+		happy.Option("usage", "koios api policy_asset_info [policy_id]"),
+	).WithFalgs(pagingFlags...)
+
+	cmd.AddInfo("Get the information for all assets under the same policy")
+
+	cmd.AddInfo(`
+  Docs: https://api.koios.rest/#get-/policy_asset_info
+
+  Example: koios-cli api policy_asset_info 750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+		res, err := c.koios().GetPolicyAssetInfo(sess, koios.PolicyID(args.Arg(0).String()), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdAssetPolicyAssetList(c *client) *happy.Command {
