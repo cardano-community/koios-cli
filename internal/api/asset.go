@@ -267,7 +267,40 @@ func cmdAssetUtxos(c *client) *happy.Command {
 }
 
 func cmdAssetPolicyAssetAddresses(c *client) *happy.Command {
-	return notimplCmd(categoryAsset, "policy_asset_addresses")
+	cmd := happy.NewCommand("policy_asset_addresses",
+		happy.Option("description", "Policy Asset Address List"),
+		happy.Option("category", categoryAsset),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 1),
+		happy.Option("usage", "koios api policy_asset_addresses [policy_id]"),
+	).WithFalgs(pagingFlags...)
+
+	cmd.AddInfo("Get the list of addresses with quantity for each asset on the given policy")
+
+	cmd.AddInfo(`
+  Note - Due to cardano's UTxO design and usage from projects, asset to addresses map can be infinite.
+  Thus, for a small subset of active projects with millions of transactions, these might end up with timeouts
+  (HTTP code 504) on free layer. Such large-scale projects are free to subscribe to query layers to have a
+  dedicated cache table for themselves served via Koios.
+  `)
+
+	cmd.AddInfo(`
+  Docs: https://api.koios.rest/#get-/policy_asset_addresses
+
+  Example: koios-cli api policy_asset_addresses 750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+		res, err := c.koios().GetAssetPolicyAddresses(sess, koios.PolicyID(args.Arg(0).String()), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdAssetPolicyAssetInfo(c *client) *happy.Command {
