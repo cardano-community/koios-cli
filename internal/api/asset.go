@@ -196,7 +196,33 @@ func cmdAssetNftAddress(c *client) *happy.Command {
 }
 
 func cmdAssetSummary(c *client) *happy.Command {
-	return notimplCmd(categoryAsset, "asset_summary")
+	cmd := happy.NewCommand("asset_summary",
+		happy.Option("description", "Asset Summary"),
+		happy.Option("category", categoryAsset),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 1),
+		happy.Option("usage", "koios api asset_summary [policy_id].[asset_name]"),
+	)
+
+	cmd.AddInfo("Get the summary of an asset (total transactions exclude minting/total wallets include only wallets with asset balance)")
+	cmd.AddInfo(`
+  Docs: https://api.koios.rest/#get-/asset_summary
+
+  Example: koios-cli api asset_summary 750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501.424f4f4b
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+		policy, asset, _ := strings.Cut(args.Arg(0).String(), ".")
+		res, err := c.koios().GetAssetSummary(sess, koios.PolicyID(policy), koios.AssetName(asset), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdAssetTokenRegistry(c *client) *happy.Command {
