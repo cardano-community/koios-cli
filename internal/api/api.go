@@ -10,6 +10,7 @@ import (
 	"log/slog"
 	"net/url"
 	"sync"
+	"time"
 
 	"github.com/cardano-community/koios-go-client/v4"
 	"github.com/happy-sdk/happy"
@@ -54,6 +55,7 @@ func Command() *happy.Command {
 		varflag.BoolFunc("host-guildnet", false, "Use guildnet network host"),
 		varflag.BoolFunc("enable-req-stats", false, "Enable request stats"),
 		varflag.BoolFunc("no-format", false, "prints response as machine readable json string"),
+		varflag.DurationFunc("timeout", time.Duration(time.Minute), "Set timeout for the API server"),
 	)
 
 	api := &client{}
@@ -95,6 +97,7 @@ func (c *client) configure(sess *happy.Session, args happy.Args) (err error) {
 		origin = args.Flag("origin").String()
 	}
 	ratelimit := args.Flag("rate-limit").Var().Int()
+	duration := args.Flag("timeout").Var().Duration()
 
 	sess.Log().Debug(
 		"configutation",
@@ -106,8 +109,9 @@ func (c *client) configure(sess *happy.Session, args happy.Args) (err error) {
 		slog.String("host", host),
 		slog.Uint64("port", uint64(port)),
 		slog.String("origin", origin),
+		slog.Duration("timeout", duration),
 	)
-	c.kc, err = koios.New(
+	kc, err := koios.New(
 		koios.APIVersion(apiVersion),
 		koios.EnableRequestsStats(enableReqStats),
 		koios.Scheme(sheme),
@@ -115,6 +119,12 @@ func (c *client) configure(sess *happy.Session, args happy.Args) (err error) {
 		koios.Origin(origin),
 		koios.Port(uint16(port)),
 		koios.RateLimit(ratelimit),
+	)
+	if err != nil {
+		return err
+	}
+	c.kc, err = kc.WithOptions(
+		koios.Timeout(duration),
 	)
 	return
 }
