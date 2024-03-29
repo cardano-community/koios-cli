@@ -18,7 +18,26 @@ func block(cmd *happy.Command, c *client) {
 }
 
 func cmdBlockBlocks(c *client) *happy.Command {
-	return notimplCmd(categoryBlock, "blocks")
+	cmd := happy.NewCommand("blocks",
+		happy.Option("description", "Block List"),
+		happy.Option("category", categoryBlock),
+	).WithFalgs(pagingFlags...)
+
+	cmd.AddInfo("Get summarised details about all blocks (paginated - latest first)")
+	cmd.AddInfo("Docs: https://api.koios.rest/#get-/blocks")
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		res, err := c.koios().GetBlocks(sess, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdBlockBlockInfo(c *client) *happy.Command {
