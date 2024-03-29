@@ -5,6 +5,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -188,21 +189,19 @@ func getHost(args happy.Args) (string, error) {
 
 // output koios api client responses.
 func apiOutput(noFormat bool, data any, err error) {
+	buffer := &bytes.Buffer{}
+	encoder := json.NewEncoder(buffer)
+	encoder.SetEscapeHTML(false)
 
-	if noFormat {
-		out, err := json.Marshal(data)
-		if handleErr(noFormat, err) {
-			return
-		}
-		fmt.Println(string(out))
-		return
+	if !noFormat {
+		encoder.SetIndent("", "  ")
 	}
 
-	out, merr := json.MarshalIndent(data, "", " ")
-	if handleErr(noFormat, merr) {
+	if err := encoder.Encode(data); err != nil {
+		handleErr(noFormat, err)
 		return
 	}
-	fmt.Println(string(out))
+	fmt.Println(buffer.String())
 }
 
 type apiError struct {

@@ -5,7 +5,11 @@
 package api
 
 import (
+	"slices"
+
+	"github.com/cardano-community/koios-go-client/v4"
 	"github.com/happy-sdk/happy"
+	"github.com/happy-sdk/happy/pkg/vars/varflag"
 )
 
 const categoryEpoch = "epoch"
@@ -14,20 +18,51 @@ const categoryEpoch = "epoch"
 // https://api.koios.rest/#tag--Epoch
 func epoch(cmd *happy.Command, c *client) {
 	cmd.DescribeCategory(categoryEpoch, "Query epoch-specific details")
-	// cmd.AddSubCommand(cmdEpochInfo(c))
+	cmd.AddSubCommand(cmdEpochInfo(c))
 	cmd.AddSubCommand(cmdEpochParams(c))
 	cmd.AddSubCommand(cmdEpochBlockProtocols(c))
 }
 
-// func cmdEpochInfo(c *client) *happy.Command {
-// 	// cmd := happy.NewCommand("epoch_info",
-// 	// 	happy.Option("description", "Epoch Information"),
-// 	// 	happy.Option("category", categoryEpoch),
-// 	// ).WithFalgs(
-// 	// 	slices.Concat(apiSharedFlags, flagSlice(epochNoFlag))...,
-// 	// )
-// 	// return notimplCmd(categoryEpoch, "epoch_info")
-// }
+func cmdEpochInfo(c *client) *happy.Command {
+	cmd := happy.NewCommand("epoch_info",
+		happy.Option("description", "Epoch Information"),
+		happy.Option("category", categoryEpoch),
+		happy.Option("argn.min", 0),
+		happy.Option("argn.max", 1),
+	).WithFalgs(
+		slices.Concat(
+			pagingFlags,
+			flagSlice(
+				varflag.BoolFunc("include-next-epoch", false, "Include information about nearing but not yet started epoch, to get access to active stake snapshot information if available"),
+			),
+		)...,
+	)
+
+	cmd.AddInfo("Get the epoch information, all epochs if no epoch specified")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/epoch_info
+
+    Example: koios-cli api epoch_info
+    Example: koios-cli api epoch_info 320
+    Example: koios-cli api epoch_info --include-next-epoch
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		// 0  when value is invalid
+		epochNo, _ := args.Arg(0).Uint()
+		res, err := c.koios().GetEpochInfo(sess, koios.EpochNo(epochNo), args.Flag("include-next-epoch").Var().Bool(), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
+}
 
 func cmdEpochParams(c *client) *happy.Command {
 	return notimplCmd(categoryEpoch, "epoch_params")
