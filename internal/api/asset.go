@@ -50,13 +50,11 @@ func cmdAssetInfo(c *client) *happy.Command {
 
 	cmd.AddInfo("Get the information of an asset including first minting & token registry metadata.")
 	cmd.AddInfo(`
-  Docs: https://api.koios.rest/#get-/asset_info
+  Docs: https://api.koios.rest/#post-/asset_info
 
   Example: koios-cli api asset_info \
     750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501.424f4f4b \
     f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a.6b6f696f732e72657374
-
-  Example: koios-cli api asset_info
   `)
 
 	cmd.Do(func(sess *happy.Session, args happy.Args) error {
@@ -155,7 +153,41 @@ func cmdAssetTxs(c *client) *happy.Command {
 }
 
 func cmdAssetUtxos(c *client) *happy.Command {
-	return notimplCmd(categoryAsset, "asset_utxos")
+	cmd := happy.NewCommand("asset_utxos",
+		happy.Option("description", "Asset UTXOs"),
+		happy.Option("category", categoryAsset),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+	).WithFalgs(pagingFlags...)
+
+	cmd.AddInfo("Get the UTXO information of a list of assets including")
+	cmd.AddInfo(`
+  Docs: https://api.koios.rest/#post-/asset_utxos
+
+  Example: koios-cli api asset_utxos \
+    750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501.424f4f4b \
+    f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a.6b6f696f732e72657374
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+		var assets []koios.Asset
+		for _, arg := range args.Args() {
+			policy, asset, _ := strings.Cut(arg.String(), ".")
+			assets = append(assets, koios.Asset{
+				PolicyID:  koios.PolicyID(policy),
+				AssetName: koios.AssetName(asset),
+			})
+		}
+
+		res, err := c.koios().GetAssetUTxOs(sess, assets, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+	return cmd
 }
 
 func cmdAssetPolicyAssetAddresses(c *client) *happy.Command {
