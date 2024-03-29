@@ -5,10 +5,12 @@
 package api
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/cardano-community/koios-go-client/v4"
 	"github.com/happy-sdk/happy"
+	"github.com/happy-sdk/happy/pkg/vars/varflag"
 )
 
 const categoryAsset = "asset"
@@ -251,7 +253,49 @@ func cmdAssetTokenRegistry(c *client) *happy.Command {
 }
 
 func cmdAssetTxs(c *client) *happy.Command {
-	return notimplCmd(categoryAsset, "asset_txs")
+	cmd := happy.NewCommand("asset_txs",
+		happy.Option("description", "Asset Transactions"),
+		happy.Option("category", categoryAsset),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 1),
+		happy.Option("usage", "koios api asset_txs policy_id[.asset_name]"),
+	).WithFalgs(
+		slices.Concat(
+			pagingFlags,
+			flagSlice(
+				afterBlockHeightFlag,
+				varflag.BoolFunc("history", false, "Include all historical transactions, setting to false includes only the non-empty ones"),
+			),
+		)...)
+
+	cmd.AddInfo("Get the list of all asset transaction hashes (newest first).")
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/asset_txs
+
+    Example: koios-cli api asset_txs 750900e4999ebe0d58f19b634768ba25e525aaf12403bfe8fe130501.424f4f4b \
+      --after-block-height 50000 \
+      --history
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+		policy, asset, _ := strings.Cut(args.Arg(0).String(), ".")
+		res, err := c.koios().GetAssetTxs(
+			sess,
+			koios.PolicyID(policy),
+			koios.AssetName(asset),
+			args.Flag("after-block-height").Var().Uint(),
+			args.Flag("history").Var().Bool(),
+			opts,
+		)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdAssetUtxos(c *client) *happy.Command {

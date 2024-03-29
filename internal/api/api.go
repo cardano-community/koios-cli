@@ -29,6 +29,8 @@ var (
 
 	// koios api params
 	epochNoFlag = varflag.UintFunc("epoch", 320, "Set epoch number")
+
+	afterBlockHeightFlag = varflag.UintFunc("after-block-height", 0, "Block height for specifying time delta")
 )
 
 type client struct {
@@ -111,7 +113,7 @@ func (c *client) configure(sess *happy.Session, args happy.Args) (err error) {
 		slog.String("origin", origin),
 		slog.Duration("timeout", duration),
 	)
-	kc, err := koios.New(
+	c.kc, err = koios.New(
 		koios.APIVersion(apiVersion),
 		koios.EnableRequestsStats(enableReqStats),
 		koios.Scheme(sheme),
@@ -119,11 +121,6 @@ func (c *client) configure(sess *happy.Session, args happy.Args) (err error) {
 		koios.Origin(origin),
 		koios.Port(uint16(port)),
 		koios.RateLimit(ratelimit),
-	)
-	if err != nil {
-		return err
-	}
-	c.kc, err = kc.WithOptions(
 		koios.Timeout(duration),
 	)
 	return
