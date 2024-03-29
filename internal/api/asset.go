@@ -166,7 +166,33 @@ func cmdAssetList(c *client) *happy.Command {
 }
 
 func cmdAssetNftAddress(c *client) *happy.Command {
-	return notimplCmd(categoryAsset, "asset_nft_address")
+	cmd := happy.NewCommand("asset_nft_address",
+		happy.Option("description", "Asset NFT Address"),
+		happy.Option("category", categoryAsset),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 1),
+		happy.Option("usage", "koios api asset_nft_address [policy_id].[asset_name]"),
+	)
+	cmd.AddInfo("Get the address where specified NFT currently reside on.")
+
+	cmd.AddInfo(`
+  Docs: https://api.koios.rest/#get-/asset_nft_address
+
+  Example: koios-cli api asset_nft_address f0ff48bbb7bbe9d59a40f1ce90e9e9d0ff5002ec48f232b49ca0fb9a.68616e646c65
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+		policy, asset, _ := strings.Cut(args.Arg(0).String(), ".")
+		res, err := c.koios().GetAssetNftAddress(sess, koios.PolicyID(policy), koios.AssetName(asset), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdAssetSummary(c *client) *happy.Command {
