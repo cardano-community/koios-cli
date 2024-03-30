@@ -4,7 +4,10 @@
 
 package api
 
-import "github.com/happy-sdk/happy"
+import (
+	"github.com/cardano-community/koios-go-client/v4"
+	"github.com/happy-sdk/happy"
+)
 
 const categoryPool = "pool"
 
@@ -55,7 +58,41 @@ func cmdPoolPoolList(c *client) *happy.Command {
 }
 
 func cmdPoolPoolInfo(c *client) *happy.Command {
-	return notimplCmd(categoryPool, "pool_info")
+	cmd := happy.NewCommand("pool_info",
+		happy.Option("description", "Pool Information"),
+		happy.Option("category", categoryPool),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+	).WithFlags(pagingFlags...)
+
+	cmd.AddInfo("Current pool statuses and details for a specified list of pool ids")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#post-/pool_info
+
+    Example: koios-cli api pool_info \
+      pool100wj94uzf54vup2hdzk0afng4dhjaqggt7j434mtgm8v2gfvfgp \
+      pool102s2nqtea2hf5q0s4amj0evysmfnhrn4apyyhd4azcmsclzm96m \
+      pool102vsulhfx8ua2j9fwl2u7gv57fhhutc3tp6juzaefgrn7ae35wm
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		var poolIDs []koios.PoolID
+		for _, id := range args.Args() {
+			poolIDs = append(poolIDs, koios.PoolID(id.String()))
+		}
+
+		res, err := c.koios().GetPoolInfos(sess, poolIDs, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdPoolPoolStakeSnapshot(c *client) *happy.Command {
