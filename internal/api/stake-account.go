@@ -218,7 +218,46 @@ func cmdStakeAccountAccountTxs(c *client) *happy.Command {
 }
 
 func cmdStakeAccountAccountRewards(c *client) *happy.Command {
-	return notimplCmd(categoryStakeAccount, "account_rewards")
+	cmd := happy.NewCommand("account_rewards",
+		happy.Option("description", "Account Rewards"),
+		happy.Option("category", categoryStakeAccount),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api account_rewards [_stake_addresses...] // max 50"),
+	).WithFlags(slices.Concat(pagingFlags, flagSlice(epochNoFlag))...)
+
+	cmd.AddInfo("Get the full rewards history (including MIR) for given stake addresses")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#post-/account_rewards
+
+    Example: koios-cli api account_rewards \
+      stake1uyrx65wjqjgeeksd8hptmcgl5jfyrqkfq0xe8xlp367kphsckq250 \
+      stake1uxpdrerp9wrxunfh6ukyv5267j70fzxgw0fr3z8zeac5vyqhf9jhy \
+
+    Example: koios-cli api account_rewards --epoch 409 \
+      stake1uyrx65wjqjgeeksd8hptmcgl5jfyrqkfq0xe8xlp367kphsckq250 \
+      stake1uxpdrerp9wrxunfh6ukyv5267j70fzxgw0fr3z8zeac5vyqhf9jhy
+
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		var addresses []koios.Address
+		for _, arg := range args.Args() {
+			addresses = append(addresses, koios.Address(arg.String()))
+		}
+
+		res, err := c.koios().GetAccountRewards(sess, addresses, koios.EpochNo(args.Flag("epoch").Var().Uint64()), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdStakeAccountAccountUpdates(c *client) *happy.Command {
