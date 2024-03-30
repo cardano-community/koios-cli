@@ -5,8 +5,11 @@
 package api
 
 import (
+	"slices"
+
 	"github.com/cardano-community/koios-go-client/v4"
 	"github.com/happy-sdk/happy"
+	"github.com/happy-sdk/happy/pkg/vars/varflag"
 )
 
 const categoryStakeAccount = "stake account"
@@ -142,7 +145,43 @@ func cmdStakeAccountAccountInfoCached(c *client) *happy.Command {
 }
 
 func cmdStakeAccountAccountUtxos(c *client) *happy.Command {
-	return notimplCmd(categoryStakeAccount, "account_utxos")
+	cmd := happy.NewCommand("account_utxos",
+		happy.Option("description", "Account Utxos"),
+		happy.Option("category", categoryStakeAccount),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api account_utxos [_stake_addresses...] // max 50"),
+	).WithFlags(slices.Concat(pagingFlags, flagSlice(
+		varflag.BoolFunc("extended", false, "Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call"),
+	))...)
+
+	cmd.AddInfo("Get a list of all UTxOs for given stake addresses (account)s")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/account_utxos
+
+    Example: koios-cli api account_utxos \
+      stake1uyrx65wjqjgeeksd8hptmcgl5jfyrqkfq0xe8xlp367kphsckq250 \
+      stake1uxpdrerp9wrxunfh6ukyv5267j70fzxgw0fr3z8zeac5vyqhf9jhy
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		var addresses []koios.Address
+		for _, arg := range args.Args() {
+			addresses = append(addresses, koios.Address(arg.String()))
+		}
+
+		res, err := c.koios().GetAccountUtxos(sess, addresses, args.Flag("extended").Var().Bool(), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdStakeAccountAccountTxs(c *client) *happy.Command {
