@@ -5,8 +5,11 @@
 package api
 
 import (
+	"slices"
+
 	"github.com/cardano-community/koios-go-client/v4"
 	"github.com/happy-sdk/happy"
+	"github.com/happy-sdk/happy/pkg/vars/varflag"
 )
 
 const categoryScript = "script"
@@ -153,7 +156,43 @@ func cmdScriptScriptRedeemers(c *client) *happy.Command {
 }
 
 func cmdScriptScriptUtxos(c *client) *happy.Command {
-	return notimplCmd(categoryScript, "script_utxos")
+	cmd := happy.NewCommand("script_utxos",
+		happy.Option("description", "Script Utxos"),
+		happy.Option("category", categoryScript),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 1),
+		happy.Option("usage", "koios api script_utxos [_script_hash]"),
+	).WithFlags(
+		slices.Concat(
+			pagingFlags,
+			flagSlice(
+				varflag.BoolFunc("extended", false, "Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call"),
+			))...)
+
+	cmd.AddInfo("List of all UTXOs for a given script hash.")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/script_utxos
+
+    Example: koios-cli api script_utxos d8480dc869b94b80e81ec91b0abe307279311fe0e7001a9488f61ff8
+    Example: koios-cli api script_utxos d8480dc869b94b80e81ec91b0abe307279311fe0e7001a9488f61ff8 --extended
+    Example: koios-cli api script_utxos d8480dc869b94b80e81ec91b0abe307279311fe0e7001a9488f61ff8 --page 1 --page-size 3
+
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		hash := koios.ScriptHash(args.Arg(0).String())
+		res, err := c.koios().GetScriptUtxos(sess, hash, args.Flag("extended").Var().Bool(), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdScriptDatumInfo(c *client) *happy.Command {
