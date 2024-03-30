@@ -390,10 +390,44 @@ func cmdPoolPoolRelays(c *client) *happy.Command {
 	})
 
 	return cmd
-
-	return notimplCmd(categoryPool, "pool_relays")
 }
 
 func cmdPoolPoolMetadata(c *client) *happy.Command {
-	return notimplCmd(categoryPool, "pool_metadata")
+	cmd := happy.NewCommand("pool_metadata",
+		happy.Option("description", "Pool Metadata"),
+		happy.Option("category", categoryPool),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api pool_metadata [_pool_bech32_ids...] // max 50"),
+	).WithFlags(pagingFlags...)
+
+	cmd.AddInfo("Metadata (on & off-chain) for all pools")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#post-/pool_metadata
+
+    Example: koios-cli api pool_metadata \
+      pool100wj94uzf54vup2hdzk0afng4dhjaqggt7j434mtgm8v2gfvfgp \
+      pool102s2nqtea2hf5q0s4amj0evysmfnhrn4apyyhd4azcmsclzm96m \
+      pool102vsulhfx8ua2j9fwl2u7gv57fhhutc3tp6juzaefgrn7ae35wm
+
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		var poolIDs []koios.PoolID
+		for _, id := range args.Args() {
+			poolIDs = append(poolIDs, koios.PoolID(id.String()))
+		}
+
+		res, err := c.koios().GetPoolMetadata(sess, poolIDs, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
