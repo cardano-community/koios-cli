@@ -100,5 +100,33 @@ func cmdEpochParams(c *client) *happy.Command {
 }
 
 func cmdEpochBlockProtocols(c *client) *happy.Command {
-	return notimplCmd(categoryEpoch, "epoch_block_protocols")
+	cmd := happy.NewCommand("epoch_block_protocols",
+		happy.Option("description", "Epoch Block Protocols"),
+		happy.Option("category", categoryEpoch),
+		happy.Option("argn.min", 0),
+		happy.Option("argn.max", 1),
+	)
+
+	cmd.AddInfo("Get the information about block protocol distribution in epoch")
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/epoch_block_protocols
+
+    Example: koios-cli api epoch_block_protocols
+    Example: koios-cli api epoch_block_protocols 320
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		// 0  when value is invalid
+		epochNo, _ := args.Arg(0).Uint()
+		res, err := c.koios().GetEpochBlockProtocols(sess, koios.EpochNo(epochNo), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
