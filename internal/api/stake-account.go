@@ -185,7 +185,36 @@ func cmdStakeAccountAccountUtxos(c *client) *happy.Command {
 }
 
 func cmdStakeAccountAccountTxs(c *client) *happy.Command {
-	return notimplCmd(categoryStakeAccount, "account_txs")
+	cmd := happy.NewCommand("account_txs",
+		happy.Option("description", "Account Transactions"),
+		happy.Option("category", categoryStakeAccount),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 1),
+		happy.Option("usage", "koios api account_txs [_stake_address]"),
+	).WithFlags(slices.Concat(pagingFlags, flagSlice(afterBlockHeightFlag))...)
+
+	cmd.AddInfo("Get a list of all transactions for given stake address (account)")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/account_txs
+
+    Example: koios-cli api account_txs stake1u8yxtugdv63wxafy9d00nuz6hjyyp4qnggvc9a3vxh8yl0ckml2uz
+    Example: koios-cli api account_txs stake1u8yxtugdv63wxafy9d00nuz6hjyyp4qnggvc9a3vxh8yl0ckml2uz --after-block-height 50000
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		address := koios.Address(args.Arg(0).String())
+		res, err := c.koios().GetAccountTxs(sess, address, args.Flag("after-block-height").Var().Uint64(), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdStakeAccountAccountRewards(c *client) *happy.Command {
