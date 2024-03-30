@@ -4,7 +4,10 @@
 
 package api
 
-import "github.com/happy-sdk/happy"
+import (
+	"github.com/cardano-community/koios-go-client/v4"
+	"github.com/happy-sdk/happy"
+)
 
 const categoryStakeAccount = "stake account"
 
@@ -63,11 +66,79 @@ func cmdStakeAccountAccountList(c *client) *happy.Command {
 }
 
 func cmdStakeAccountAccountInfo(c *client) *happy.Command {
-	return notimplCmd(categoryStakeAccount, "account_info")
+	cmd := happy.NewCommand("account_info",
+		happy.Option("description", "Account Information"),
+		happy.Option("category", categoryStakeAccount),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api account_info_cached [_stake_addresses...] // max 50"),
+	).WithFlags(pagingFlags...)
+
+	cmd.AddInfo("Get the account information for given stake addresses")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/account_info
+
+    Example: koios-cli api account_info \
+      stake1uyrx65wjqjgeeksd8hptmcgl5jfyrqkfq0xe8xlp367kphsckq250 \
+      stake1uxpdrerp9wrxunfh6ukyv5267j70fzxgw0fr3z8zeac5vyqhf9jhy
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		var addresses []koios.Address
+		for _, arg := range args.Args() {
+			addresses = append(addresses, koios.Address(arg.String()))
+		}
+
+		res, err := c.koios().GetAccountInfo(sess, addresses, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdStakeAccountAccountInfoCached(c *client) *happy.Command {
-	return notimplCmd(categoryStakeAccount, "account_info_cached")
+	cmd := happy.NewCommand("account_info_cached",
+		happy.Option("description", "Account Information Cached"),
+		happy.Option("category", categoryStakeAccount),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api account_info_cached [_stake_addresses...] // max 50"),
+	).WithFlags(pagingFlags...)
+
+	cmd.AddInfo("Get the cached account information for given stake addresses (effective for performance query against registered accounts)")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/account_info_cached
+
+    Example: koios-cli api account_info_cached \
+      stake1uyrx65wjqjgeeksd8hptmcgl5jfyrqkfq0xe8xlp367kphsckq250 \
+      stake1uxpdrerp9wrxunfh6ukyv5267j70fzxgw0fr3z8zeac5vyqhf9jhy
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		var addresses []koios.Address
+		for _, arg := range args.Args() {
+			addresses = append(addresses, koios.Address(arg.String()))
+		}
+
+		res, err := c.koios().GetAccountInfoCached(sess, addresses, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdStakeAccountAccountUtxos(c *client) *happy.Command {
