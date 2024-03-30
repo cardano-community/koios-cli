@@ -3,7 +3,7 @@ module github.com/cardano-community/koios-cli/v2
 go 1.22
 
 require (
-	github.com/cardano-community/koios-go-client/v4 v4.0.0-20240226154756-453fefc7a2a0
+	github.com/cardano-community/koios-go-client/v4 v4.0.0-20240330222752-c1a9f65269d4
 	github.com/happy-sdk/happy v0.20.0
 	github.com/happy-sdk/happy/pkg/branding v0.1.0
 	github.com/happy-sdk/happy/pkg/cli/ansicolor v0.2.0
