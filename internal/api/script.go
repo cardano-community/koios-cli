@@ -118,7 +118,38 @@ func cmdScriptPlutusScriptList(c *client) *happy.Command {
 }
 
 func cmdScriptScriptRedeemers(c *client) *happy.Command {
-	return notimplCmd(categoryScript, "script_redeemers")
+	cmd := happy.NewCommand("script_redeemers",
+		happy.Option("description", "Script Redeemers"),
+		happy.Option("category", categoryScript),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 1),
+		happy.Option("usage", "koios api script_redeemers [_script_hash]"),
+	).WithFlags(pagingFlags...)
+
+	cmd.AddInfo("List of all redeemers for a given script hash.")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/script_redeemers
+
+    Example: koios-cli api script_redeemers d8480dc869b94b80e81ec91b0abe307279311fe0e7001a9488f61ff8
+
+    Example: koios-cli api script_redeemers d8480dc869b94b80e81ec91b0abe307279311fe0e7001a9488f61ff8 --page 1 --page-size 3
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		hash := koios.ScriptHash(args.Arg(0).String())
+		res, err := c.koios().GetScriptRedeemers(sess, hash, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+
+	})
+
+	return cmd
 }
 
 func cmdScriptScriptUtxos(c *client) *happy.Command {
