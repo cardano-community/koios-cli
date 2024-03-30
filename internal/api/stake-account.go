@@ -345,7 +345,41 @@ func cmdStakeAccountAccountAddresses(c *client) *happy.Command {
 }
 
 func cmdStakeAccountAccountAssets(c *client) *happy.Command {
-	return notimplCmd(categoryStakeAccount, "account_assets")
+	cmd := happy.NewCommand("account_assets",
+		happy.Option("description", "Account Assets"),
+		happy.Option("category", categoryStakeAccount),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api account_assets [_stake_addresses...] // max 50"),
+	).WithFlags(pagingFlags...)
+
+	cmd.AddInfo("Get the native asset balance for a given stake address(es)")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#post-/account_assets
+
+    Example: koios-cli api account_assets \
+      stake1uyrx65wjqjgeeksd8hptmcgl5jfyrqkfq0xe8xlp367kphsckq250 \
+      stake1uxpdrerp9wrxunfh6ukyv5267j70fzxgw0fr3z8zeac5vyqhf9jhy
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		var addresses []koios.Address
+		for _, arg := range args.Args() {
+			addresses = append(addresses, koios.Address(arg.String()))
+		}
+
+		res, err := c.koios().GetAccountAssets(sess, addresses, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdStakeAccountAccountHistory(c *client) *happy.Command {
