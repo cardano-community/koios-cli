@@ -7,9 +7,13 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"log/slog"
 	"net/url"
+	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -56,9 +60,10 @@ func Command() *happy.Command {
 		varflag.BoolFunc("host-preview", false, "Use preview network host"),
 		varflag.BoolFunc("host-preprod", false, "Use preprod network host"),
 		varflag.BoolFunc("host-guildnet", false, "Use guildnet network host"),
-		varflag.BoolFunc("enable-req-stats", false, "Enable request stats"),
+		varflag.BoolFunc("stats", false, "Enable request stats"),
 		varflag.BoolFunc("no-format", false, "prints response as machine readable json string"),
 		varflag.DurationFunc("timeout", time.Duration(time.Minute), "Set timeout for the API server"),
+		varflag.StringFunc("auth", "", "JWT Bearer Auth token generated via https://koios.rest Profile page."),
 	)
 
 	api := &client{}
@@ -83,7 +88,7 @@ func (c *client) configure(sess *happy.Session, args happy.Args) (err error) {
 	sess.Log().Debug("configure koios api client")
 
 	apiVersion := args.Flag("api-version").String()
-	enableReqStats, err := args.Flag("enable-req-stats").Var().Value().Bool()
+	enableReqStats, err := args.Flag("stats").Var().Value().Bool()
 	if err != nil {
 		return err
 	}
@@ -105,7 +110,7 @@ func (c *client) configure(sess *happy.Session, args happy.Args) (err error) {
 	sess.Log().Debug(
 		"configutation",
 		slog.String("api-version", apiVersion),
-		slog.Bool("enable-req-stats", enableReqStats),
+		slog.Bool("stats", enableReqStats),
 		slog.Bool("no-format", c.noFormat),
 		slog.Int("rate-limit", ratelimit),
 		slog.String("sheme", sheme),
@@ -124,6 +129,30 @@ func (c *client) configure(sess *happy.Session, args happy.Args) (err error) {
 		koios.RateLimit(ratelimit),
 		koios.Timeout(duration),
 	)
+
+	if args.Flag("profile").Present() && args.Flag("auth").Present() {
+		return fmt.Errorf("profile and auth flags cannot be used together")
+	}
+
+	if args.Flag("auth").Present() {
+		if err := c.kc.SetAuth(args.Flag("auth").String()); err != nil {
+			return fmt.Errorf("failed to set auth token: %w", err)
+		}
+	}
+
+	if args.Flag("profile").Present() {
+		koiosAuthFile := filepath.Join(sess.Get("app.fs.path.config").String(), "koios-auth.jwt")
+		if _, err := os.Stat(koiosAuthFile); errors.Is(err, fs.ErrNotExist) {
+			return fmt.Errorf("auth token file not found: %w", err)
+		}
+
+		tokenfile, err := os.ReadFile(koiosAuthFile)
+		if err != nil {
+			return fmt.Errorf("failed to read auth token file: %w", err)
+		}
+		return c.kc.SetAuth(string(tokenfile))
+	}
+
 	return
 }
 

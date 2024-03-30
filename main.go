@@ -6,6 +6,7 @@ package main
 
 import (
 	"github.com/cardano-community/koios-cli/v2/internal/api"
+	"github.com/cardano-community/koios-cli/v2/internal/auth"
 	"github.com/cardano-community/koios-cli/v2/koios"
 	"github.com/happy-sdk/happy"
 	"github.com/happy-sdk/happy/sdk/logging"
@@ -28,7 +29,8 @@ func main() {
 	}).
 		WithLogger(logging.Console(logOpts)).
 		WithBrand(koios.Brand()).
-		WithCommand(api.Command())
+		WithCommand(api.Command()).
+		WithCommand(auth.Command())
 
 	app.Run()
 }
