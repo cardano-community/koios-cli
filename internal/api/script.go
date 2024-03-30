@@ -196,5 +196,42 @@ func cmdScriptScriptUtxos(c *client) *happy.Command {
 }
 
 func cmdScriptDatumInfo(c *client) *happy.Command {
-	return notimplCmd(categoryScript, "datum_info")
+
+	cmd := happy.NewCommand("datum_info",
+		happy.Option("description", "Datum Information"),
+		happy.Option("category", categoryScript),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api datum_info [_datum_hashes...] // max 50"),
+	).WithFlags(pagingFlags...)
+
+	cmd.AddInfo("List of datum information for given datum hashes")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#post-/datum_info
+
+    Example: koios-cli api datum_info \
+      818ee3db3bbbd04f9f2ce21778cac3ac605802a4fcb00c8b3a58ee2dafc17d46 \
+      45b0cfc220ceec5b7c1c62c4d4193d38e4eba48e8815729ce75f9c0ab0e4c1c0
+
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		var hashes []koios.DatumHash
+		for _, arg := range args.Args() {
+			hashes = append(hashes, koios.DatumHash(arg.String()))
+		}
+
+		res, err := c.koios().GetDatumInfos(sess, hashes, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
