@@ -156,7 +156,32 @@ func cmdTransactionsTxMetadata(c *client) *happy.Command {
 }
 
 func cmdTransactionsTxMetalabels(c *client) *happy.Command {
-	return notimplCmd(categoryTransactions, "tx_metalabels")
+	cmd := happy.NewCommand("tx_metalabels",
+		happy.Option("description", "Transaction Metadata Labels"),
+		happy.Option("category", categoryTransactions),
+		happy.Option("usage", "koios api tx_metalabels"),
+	).WithFlags(pagingFlags...)
+
+	cmd.AddInfo("Get a list of all transaction metalabels")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/tx_metalabels
+
+    Example: koios-cli api tx_metalabels
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		res, err := c.koios().GetTxMetaLabels(sess, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdTransactionsSubmittx(c *client) *happy.Command {
