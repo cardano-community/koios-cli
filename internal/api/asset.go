@@ -32,6 +32,7 @@ func asset(cmd *happy.Command, c *client) {
 	cmd.AddSubCommand(cmdAssetPolicyAssetAddresses(c))
 	cmd.AddSubCommand(cmdAssetPolicyAssetInfo(c))
 	cmd.AddSubCommand(cmdAssetPolicyAssetList(c))
+	cmd.AddSubCommand(cmdAssetPolicyAssetMints(c))
 }
 
 func cmdAssetAddresses(c *client) *happy.Command {
@@ -424,6 +425,37 @@ func cmdAssetPolicyAssetList(c *client) *happy.Command {
 			return nil
 		}
 		res, err := c.koios().GetPolicyAssetList(sess, koios.PolicyID(args.Arg(0).String()), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
+}
+
+func cmdAssetPolicyAssetMints(c *client) *happy.Command {
+	cmd := happy.NewCommand("policy_asset_mints",
+		happy.Option("description", "Policy Asset Mints"),
+		happy.Option("category", categoryAsset),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 1),
+		happy.Option("usage", "koios api policy_asset_mints [_asset_policy]"),
+	).WithFlags(pagingFlags...)
+
+	cmd.AddInfo("Get a list of mint or burn count details for all assets minted under a policy")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/policy_asset_mints
+
+    Example: koios-cli api policy_asset_mints 313534a537bc476c86ff7c57ec511bd7f24a9d15654091b24e9c606e
+    Example: koios-cli api policy_asset_mints 313534a537bc476c86ff7c57ec511bd7f24a9d15654091b24e9c606e --page 1 --page-size 3
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+		res, err := c.koios().GetPolicyAssetMints(sess, koios.PolicyID(args.Arg(0).String()), opts)
 		apiOutput(c.noFormat, res, err)
 		return err
 	})
