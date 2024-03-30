@@ -90,7 +90,31 @@ func cmdScriptNativeScriptList(c *client) *happy.Command {
 }
 
 func cmdScriptPlutusScriptList(c *client) *happy.Command {
-	return notimplCmd(categoryScript, "plutus_script_list")
+	cmd := happy.NewCommand("plutus_script_list",
+		happy.Option("description", "Plutus Script List"),
+		happy.Option("category", categoryScript),
+	).WithFlags(pagingFlags...)
+
+	cmd.AddInfo("List of all existing Plutus script hashes along with their creation transaction hashes.")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/plutus_script_list
+
+    Example: koios-cli api plutus_script_list
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		res, err := c.koios().GetPlutusScripts(sess, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdScriptScriptRedeemers(c *client) *happy.Command {
