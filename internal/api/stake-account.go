@@ -26,7 +26,40 @@ func stakeAccount(cmd *happy.Command, c *client) {
 }
 
 func cmdStakeAccountAccountList(c *client) *happy.Command {
-	return notimplCmd(categoryStakeAccount, "account_list")
+	cmd := happy.NewCommand("account_list",
+		happy.Option("description", "Account List"),
+		happy.Option("category", categoryStakeAccount),
+	).WithFlags(pagingFlags...)
+
+	cmd.AddInfo("Get a list of all stake addresses that have atleast 1 transaction")
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/account_list
+
+    Example: koios-cli api account_list
+
+    {
+      "data": [
+        "stake1uyfmzu5qqy70a8kq4c8rw09q0w0ktfcxppwujejnsh6tyrg5c774g",
+        "stake1uy9crcqratu65rklv0v7eyt4hnkpewkjgtwgwmkwzl573msyk9gjl",
+        "stake1uydhlh7f2kkw9eazct5zyzlrvj32gjnkmt2v5qf6t8rut4qwch8ey",
+        ...
+      ]
+    }
+
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		res, err := c.koios().GetAccountList(sess, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdStakeAccountAccountInfo(c *client) *happy.Command {
