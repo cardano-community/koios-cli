@@ -4,7 +4,13 @@
 
 package api
 
-import "github.com/happy-sdk/happy"
+import (
+	"slices"
+
+	"github.com/cardano-community/koios-go-client/v4"
+	"github.com/happy-sdk/happy"
+	"github.com/happy-sdk/happy/pkg/vars/varflag"
+)
 
 const categoryTransactions = "transactions"
 
@@ -22,7 +28,47 @@ func transactions(cmd *happy.Command, c *client) {
 }
 
 func cmdTransactionsUtxoInfo(c *client) *happy.Command {
-	return notimplCmd(categoryTransactions, "utxo_info")
+	cmd := happy.NewCommand("utxo_info",
+		happy.Option("description", "UTxO Info"),
+		happy.Option("category", categoryTransactions),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api utxo_info [_utxo_refs...] // max 50"),
+	).WithFlags(slices.Concat(pagingFlags, flagSlice(
+		varflag.BoolFunc("extended", false, "Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call"),
+	))...)
+
+	cmd.AddInfo("Array of Cardano UTxO references in the form \"hash#index\" with extended flag to toggle additional fields")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#post-/utxo_info
+
+    Example: koios-cli api utxo_info \
+      f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e#0 \
+      0b8ba3bed976fa4913f19adc9f6dd9063138db5b4dd29cecde369456b5155e94#0
+
+    Example: koios-cli api utxo_info --extended \
+      f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e#0 \
+      0b8ba3bed976fa4913f19adc9f6dd9063138db5b4dd29cecde369456b5155e94#0
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		var utxos []koios.UTxORef
+		for _, arg := range args.Args() {
+			utxos = append(utxos, koios.UTxORef(arg.String()))
+		}
+
+		res, err := c.koios().GetUTxOInfo(sess, utxos, args.Flag("extended").Var().Bool(), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdTransactionsTxInfo(c *client) *happy.Command {
