@@ -293,7 +293,38 @@ func cmdPoolPoolUpdates(c *client) *happy.Command {
 }
 
 func cmdPoolPoolRegistrations(c *client) *happy.Command {
-	return notimplCmd(categoryPool, "pool_registrations")
+	cmd := happy.NewCommand("pool_registrations",
+		happy.Option("description", "Pool Registrations"),
+		happy.Option("category", categoryPool),
+		happy.Option("argn.min", 0),
+		happy.Option("argn.max", 1),
+		happy.Option("usage", "koios api pool_registrations [_epoch_no]"),
+	).WithFlags(pagingFlags...)
+
+	cmd.AddInfo("Return all pool registrations initiated in the requested epoch")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/pool_registrations
+
+    Example: koios-cli api pool_registrations
+    Example: koios-cli api pool_registrations 320
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		// 0 when value is invalid
+		epochNo, _ := args.Arg(0).Uint()
+
+		res, err := c.koios().GetPoolRegistrations(sess, koios.EpochNo(epochNo), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdPoolPoolRetirements(c *client) *happy.Command {
