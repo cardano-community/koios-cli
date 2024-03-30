@@ -261,7 +261,35 @@ func cmdPoolPoolHistory(c *client) *happy.Command {
 }
 
 func cmdPoolPoolUpdates(c *client) *happy.Command {
-	return notimplCmd(categoryPool, "pool_updates")
+	cmd := happy.NewCommand("pool_updates",
+		happy.Option("description", "Pool Updates (History)"),
+		happy.Option("category", categoryPool),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 1),
+		happy.Option("usage", "koios api pool_updates [_pool_bech32]"),
+	).WithFlags(pagingFlags...)
+
+	cmd.AddInfo("Return all pool updates for all pools or only updates for specific pool if specified")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/pool_updates
+
+    Example: koios-cli api pool_updates
+    Example: koios-cli api pool_updates pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		res, err := c.koios().GetPoolUpdates(sess, koios.PoolID(args.Arg(0).String()), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdPoolPoolRegistrations(c *client) *happy.Command {
