@@ -63,6 +63,7 @@ func cmdPoolPoolInfo(c *client) *happy.Command {
 		happy.Option("category", categoryPool),
 		happy.Option("argn.min", 1),
 		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api pool_info [_pool_bech32_ids...] // max 50"),
 	).WithFlags(pagingFlags...)
 
 	cmd.AddInfo("Current pool statuses and details for a specified list of pool ids")
@@ -96,7 +97,34 @@ func cmdPoolPoolInfo(c *client) *happy.Command {
 }
 
 func cmdPoolPoolStakeSnapshot(c *client) *happy.Command {
-	return notimplCmd(categoryPool, "pool_stake_snapshot")
+	cmd := happy.NewCommand("pool_stake_snapshot",
+		happy.Option("description", "Pool Stake Snapshot"),
+		happy.Option("category", categoryPool),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 1),
+		happy.Option("usage", "koios api pool_stake_snapshot _pool_bech32"),
+	)
+
+	cmd.AddInfo("Returns Mark, Set and Go stake snapshots for the selected pool, useful for leaderlog calculation")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/pool_stake_snapshot
+
+    Example: koios-cli api pool_stake_snapshot pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		res, err := c.koios().GetPoolStakeSnapshot(sess, koios.PoolID(args.Arg(0).String()), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdPoolPoolDelegators(c *client) *happy.Command {
