@@ -272,7 +272,7 @@ func cmdStakeAccountAccountUpdates(c *client) *happy.Command {
 	cmd.AddInfo("Get the account updates (registration, deregistration, delegation and withdrawals) for given stake addresses")
 
 	cmd.AddInfo(`
-    Docs: https://api.koios.rest/#get-/account_updates
+    Docs: https://api.koios.rest/#post-/account_updates
 
     Example: koios-cli api account_updates \
       stake1uyrx65wjqjgeeksd8hptmcgl5jfyrqkfq0xe8xlp367kphsckq250 \
@@ -300,7 +300,48 @@ func cmdStakeAccountAccountUpdates(c *client) *happy.Command {
 }
 
 func cmdStakeAccountAccountAddresses(c *client) *happy.Command {
-	return notimplCmd(categoryStakeAccount, "account_addresses")
+	cmd := happy.NewCommand("account_addresses",
+		happy.Option("description", "Account Addresses"),
+		happy.Option("category", categoryStakeAccount),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api account_addresses [_stake_addresses...] // max 50"),
+	).WithFlags(slices.Concat(pagingFlags, flagSlice(
+		varflag.BoolFunc("first-only", false, "Only return the first result"),
+		varflag.BoolFunc("empty", false, "Include zero quantity entries"),
+	))...)
+
+	cmd.AddInfo("Get all addresses associated with given staking accounts")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#post-/account_addresses
+
+    Example: koios-cli api account_addresses \
+      stake1uyrx65wjqjgeeksd8hptmcgl5jfyrqkfq0xe8xlp367kphsckq250 \
+      stake1uxpdrerp9wrxunfh6ukyv5267j70fzxgw0fr3z8zeac5vyqhf9jhy
+
+    Example: koios-cli api account_addresses --first-only --empty \
+      stake1uyrx65wjqjgeeksd8hptmcgl5jfyrqkfq0xe8xlp367kphsckq250 \
+      stake1uxpdrerp9wrxunfh6ukyv5267j70fzxgw0fr3z8zeac5vyqhf9jhy
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		var addresses []koios.Address
+		for _, arg := range args.Args() {
+			addresses = append(addresses, koios.Address(arg.String()))
+		}
+
+		res, err := c.koios().GetAccountAddresses(sess, addresses, args.Flag("first-only").Var().Bool(), args.Flag("empty").Var().Bool(), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdStakeAccountAccountAssets(c *client) *happy.Command {
