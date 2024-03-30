@@ -228,7 +228,36 @@ func cmdPoolPoolBlocks(c *client) *happy.Command {
 }
 
 func cmdPoolPoolHistory(c *client) *happy.Command {
-	return notimplCmd(categoryPool, "pool_history")
+	cmd := happy.NewCommand("pool_history",
+		happy.Option("description", "Pool History"),
+		happy.Option("category", categoryPool),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 1),
+		happy.Option("usage", "koios api pool_history [_pool_bech32]"),
+	).WithFlags(slices.Concat(pagingFlags, flagSlice(epochNoFlag))...)
+
+	cmd.AddInfo("Return information about pool stake, block and reward history in a given epoch _epoch_no (or all epochs that pool existed for, in descending order if no _epoch_no was provided)")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/pool_history
+
+    Example: koios-cli api pool_history pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc
+    Example: koios-cli api pool_history pool155efqn9xpcf73pphkk88cmlkdwx4ulkg606tne970qswczg3asc --epoch 320
+
+    `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		res, err := c.koios().GetPoolHistory(sess, koios.PoolID(args.Arg(0).String()), koios.EpochNo(args.Flag("epoch").Var().Uint()), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdPoolPoolUpdates(c *client) *happy.Command {
