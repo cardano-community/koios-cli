@@ -24,7 +24,6 @@ func transactions(cmd *happy.Command, c *client) {
 	cmd.AddSubCommand(cmdTransactionsTxMetalabels(c))
 	cmd.AddSubCommand(cmdTransactionsSubmittx(c))
 	cmd.AddSubCommand(cmdTransactionsTxStatus(c))
-	cmd.AddSubCommand(cmdTransactionsTxUtxos(c))
 }
 
 func cmdTransactionsUtxoInfo(c *client) *happy.Command {
@@ -189,9 +188,39 @@ func cmdTransactionsSubmittx(c *client) *happy.Command {
 }
 
 func cmdTransactionsTxStatus(c *client) *happy.Command {
-	return notimplCmd(categoryTransactions, "tx_status")
-}
+	cmd := happy.NewCommand("tx_status",
+		happy.Option("description", "Transaction Status"),
+		happy.Option("category", categoryTransactions),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api tx_status [_tx_hashes...] // max 50"),
+	)
 
-func cmdTransactionsTxUtxos(c *client) *happy.Command {
-	return notimplCmd(categoryTransactions, "tx_utxos")
+	cmd.AddInfo("Get the number of block confirmations for a given transaction hash list")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#post-/tx_status
+
+    Example: koios-cli api tx_status \
+      f144a8264acf4bdfe2e1241170969c930d64ab6b0996a4a45237b623f1dd670e \
+      0b8ba3bed976fa4913f19adc9f6dd9063138db5b4dd29cecde369456b5155e94
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		var txs []koios.TxHash
+		for _, arg := range args.Args() {
+			txs = append(txs, koios.TxHash(arg.String()))
+		}
+
+		res, err := c.koios().GetTxStatus(sess, txs, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
