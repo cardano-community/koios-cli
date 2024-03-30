@@ -45,7 +45,7 @@ func Command() *happy.Command {
 		happy.Option("description", "Interact with Koios API REST endpoints"),
 		happy.Option("before.shared", true),
 		// happy.Option("category", "API"), // enable when more subcommands are implemented
-	).WithFalgs(
+	).WithFlags(
 		varflag.UintFunc("port", uint(koios.DefaultPort), "Set port number for the API server"),
 		varflag.StringFunc("scheme", koios.DefaultScheme, "Set scheme for the API server"),
 		varflag.StringFunc("api-version", koios.DefaultAPIVersion, "Set API version"),

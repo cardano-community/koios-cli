@@ -29,7 +29,7 @@ func cmdEpochInfo(c *client) *happy.Command {
 		happy.Option("category", categoryEpoch),
 		happy.Option("argn.min", 0),
 		happy.Option("argn.max", 1),
-	).WithFalgs(
+	).WithFlags(
 		slices.Concat(
 			pagingFlags,
 			flagSlice(
@@ -70,7 +70,7 @@ func cmdEpochParams(c *client) *happy.Command {
 		happy.Option("category", categoryEpoch),
 		happy.Option("argn.min", 0),
 		happy.Option("argn.max", 1),
-	).WithFalgs(
+	).WithFlags(
 		pagingFlags...,
 	)
 

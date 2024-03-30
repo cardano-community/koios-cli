@@ -27,7 +27,31 @@ func pool(cmd *happy.Command, c *client) {
 }
 
 func cmdPoolPoolList(c *client) *happy.Command {
-	return notimplCmd(categoryPool, "pool_list")
+	cmd := happy.NewCommand("pool_list",
+		happy.Option("description", "List of brief info for all pools"),
+		happy.Option("category", categoryPool),
+	).WithFlags(pagingFlags...)
+
+	cmd.AddInfo("Get the list of all pools")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/pool_list
+
+    Example: koios-cli api pool_list
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		res, err := c.koios().GetPoolList(sess, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdPoolPoolInfo(c *client) *happy.Command {

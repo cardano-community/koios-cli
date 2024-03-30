@@ -29,7 +29,7 @@ func cmdNetworkTip(c *client) *happy.Command {
 	cmd := happy.NewCommand("tip",
 		happy.Option("description", "Query Chain Tip"),
 		happy.Option("category", categoryNetwork),
-	).WithFalgs(queryFlag)
+	).WithFlags(queryFlag)
 	cmd.AddInfo("Get the tip info about the latest block seen by chain")
 	cmd.AddInfo(`
   Docs: https://api.koios.rest/#get-/tip
@@ -78,7 +78,7 @@ func cmdNetworkGenesis(c *client) *happy.Command {
 	cmd := happy.NewCommand("genesis",
 		happy.Option("description", "Get Genesis info"),
 		happy.Option("category", categoryNetwork),
-	).WithFalgs(queryFlag)
+	).WithFlags(queryFlag)
 	cmd.AddInfo("Get the Genesis parameters used to start specific era on chain")
 	cmd.AddInfo(`
   Docs: https://api.koios.rest/#get-/genesis
@@ -120,7 +120,7 @@ func cmdNetworkTotals(c *client) *happy.Command {
 	cmd := happy.NewCommand("totals",
 		happy.Option("description", "Get historical tokenomic stats"),
 		happy.Option("category", categoryNetwork),
-	).WithFalgs(
+	).WithFlags(
 		slices.Concat(pagingFlags, flagSlice(epochNoFlag))...,
 	)
 	cmd.AddInfo(`
@@ -172,7 +172,7 @@ func cmdNetworkParamUpdates(c *client) *happy.Command {
 	cmd := happy.NewCommand("param_updates",
 		happy.Option("description", "Param Update Proposals"),
 		happy.Option("category", categoryNetwork),
-	).WithFalgs(
+	).WithFlags(
 		slices.Concat(pagingFlags, flagSlice(queryFlag))...,
 	)
 	cmd.AddInfo("Get all parameter update proposals submitted to the chain starting Shelley era")
@@ -203,7 +203,7 @@ func cmdNetworkReserveWithdrawals(c *client) *happy.Command {
 	cmd := happy.NewCommand("reserve_withdrawals",
 		happy.Option("description", "Reserve Withdrawals"),
 		happy.Option("category", categoryNetwork),
-	).WithFalgs(
+	).WithFlags(
 		slices.Concat(pagingFlags, flagSlice(queryFlag))...,
 	)
 	cmd.AddInfo("List of all withdrawals from reserves against stake accounts")
@@ -232,7 +232,7 @@ func cmdNetworkTreasuryWithdrawals(c *client) *happy.Command {
 	cmd := happy.NewCommand("treasury_withdrawals",
 		happy.Option("description", "Treasury Withdrawals"),
 		happy.Option("category", categoryNetwork),
-	).WithFalgs(
+	).WithFlags(
 		slices.Concat(pagingFlags, flagSlice(queryFlag))...,
 	)
 	cmd.AddInfo("List of all withdrawals from treasury against stake accounts")

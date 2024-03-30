@@ -98,7 +98,7 @@ func cmdAssetInfo(c *client) *happy.Command {
 		happy.Option("category", categoryAsset),
 		happy.Option("argn.min", 1),
 		happy.Option("argn.max", 50),
-	).WithFalgs(pagingFlags...)
+	).WithFlags(pagingFlags...)
 
 	cmd.AddInfo("Get the information of an asset including first minting & token registry metadata.")
 	cmd.AddInfo(`
@@ -135,7 +135,7 @@ func cmdAssetList(c *client) *happy.Command {
 	cmd := happy.NewCommand("asset_list",
 		happy.Option("description", "Asset List"),
 		happy.Option("category", categoryAsset),
-	).WithFalgs(pagingFlags...)
+	).WithFlags(pagingFlags...)
 	cmd.AddInfo("Get the list of all native assets (paginated)")
 	cmd.AddInfo(`
   Docs: https://api.koios.rest/#get-/asset_list
@@ -231,7 +231,7 @@ func cmdAssetTokenRegistry(c *client) *happy.Command {
 	cmd := happy.NewCommand("asset_token_registry",
 		happy.Option("description", "Asset Token Registry"),
 		happy.Option("category", categoryAsset),
-	).WithFalgs(pagingFlags...)
+	).WithFlags(pagingFlags...)
 	cmd.AddInfo("Get a list of assets registered via token registry on github")
 	cmd.AddInfo(`
   Docs: https://api.koios.rest/#get-/asset_token_registry
@@ -259,7 +259,7 @@ func cmdAssetTxs(c *client) *happy.Command {
 		happy.Option("argn.min", 1),
 		happy.Option("argn.max", 1),
 		happy.Option("usage", "koios api asset_txs policy_id[.asset_name]"),
-	).WithFalgs(
+	).WithFlags(
 		slices.Concat(
 			pagingFlags,
 			flagSlice(
@@ -304,7 +304,7 @@ func cmdAssetUtxos(c *client) *happy.Command {
 		happy.Option("category", categoryAsset),
 		happy.Option("argn.min", 1),
 		happy.Option("argn.max", 50),
-	).WithFalgs(pagingFlags...)
+	).WithFlags(pagingFlags...)
 
 	cmd.AddInfo("Get the UTXO information of a list of assets including")
 	cmd.AddInfo(`
@@ -343,7 +343,7 @@ func cmdAssetPolicyAssetAddresses(c *client) *happy.Command {
 		happy.Option("argn.min", 1),
 		happy.Option("argn.max", 1),
 		happy.Option("usage", "koios api policy_asset_addresses [policy_id]"),
-	).WithFalgs(pagingFlags...)
+	).WithFlags(pagingFlags...)
 
 	cmd.AddInfo("Get the list of addresses with quantity for each asset on the given policy")
 
@@ -380,7 +380,7 @@ func cmdAssetPolicyAssetInfo(c *client) *happy.Command {
 		happy.Option("argn.min", 1),
 		happy.Option("argn.max", 1),
 		happy.Option("usage", "koios api policy_asset_info [policy_id]"),
-	).WithFalgs(pagingFlags...)
+	).WithFlags(pagingFlags...)
 
 	cmd.AddInfo("Get the information for all assets under the same policy")
 
@@ -410,7 +410,7 @@ func cmdAssetPolicyAssetList(c *client) *happy.Command {
 		happy.Option("argn.min", 1),
 		happy.Option("argn.max", 1),
 		happy.Option("usage", "koios api policy_asset_list [policy_id]"),
-	).WithFalgs(pagingFlags...)
+	).WithFlags(pagingFlags...)
 	cmd.AddInfo("Get the list of all assets minted under a given policy (paginated)")
 	cmd.AddInfo(`
   Docs: https://api.koios.rest/#get-/policy_asset_list

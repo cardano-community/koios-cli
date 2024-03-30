@@ -30,7 +30,7 @@ func cmdAddressAddressInfo(c *client) *happy.Command {
 		happy.Option("category", categoryAddress),
 		happy.Option("argn.max", 100),
 		happy.Option("usage", "koios api address_info [_addresses...] // max 100"),
-	).WithFalgs(queryFlag)
+	).WithFlags(queryFlag)
 	cmd.AddInfo("Get address info - balance, associated stake address (if any) and UTxO set for given addresses")
 	cmd.AddInfo(`
   Docs: https://api.koios.rest/#post-/address_info
@@ -67,7 +67,7 @@ func cmdAddressAddressAssets(c *client) *happy.Command {
 		happy.Option("argn.min", 1),
 		happy.Option("argn.max", 50),
 		happy.Option("usage", "koios api address_assets [addresses...] // max 50"),
-	).WithFalgs(queryFlag)
+	).WithFlags(queryFlag)
 	cmd.AddInfo("Get the list of all the assets (policy, name and quantity) for given addresses")
 	cmd.AddInfo(`
   Docs: https://api.koios.rest/#post-/address_assets
@@ -105,7 +105,7 @@ func cmdAddressAddressTxs(c *client) *happy.Command {
 		happy.Option("argn.max", 50),
 		happy.Option("usage", "koios api address_txs --after-block-height 9945516 [addresses...] // max 50"),
 	).
-		WithFalgs(varflag.UintFunc("after-block-height", 0, "Only fetch information after specific block height"))
+		WithFlags(varflag.UintFunc("after-block-height", 0, "Only fetch information after specific block height"))
 
 	cmd.AddInfo("Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive)")
 	cmd.AddInfo(`
@@ -146,7 +146,7 @@ func cmdAddressAddressUtxos(c *client) *happy.Command {
 		happy.Option("argn.max", 50),
 		happy.Option("usage", "koios api address_utxos [addresses...] // max 50"),
 	).
-		WithFalgs(varflag.BoolFunc("extended", false, "Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call", "e"))
+		WithFlags(varflag.BoolFunc("extended", false, "Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call", "e"))
 
 	cmd.AddInfo("Get the UTxO set for given addresses")
 	cmd.AddInfo(`
@@ -187,7 +187,7 @@ func cmdAddressCredentialTxs(c *client) *happy.Command {
 		happy.Option("argn.max", 50),
 		happy.Option("usage", "koios api credential_txs --after-block-height 6238675 [credentials...] // max 50"),
 	).
-		WithFalgs(varflag.UintFunc("after-block-height", 0, "Only fetch information after specific block height (inclusive)"))
+		WithFlags(varflag.UintFunc("after-block-height", 0, "Only fetch information after specific block height (inclusive)"))
 
 	cmd.AddInfo("Get the transaction hash list of input payment credential array, optionally filtering after specified block height (inclusive)")
 
@@ -227,7 +227,7 @@ func cmdAddressCredentialUtxos(c *client) *happy.Command {
 		happy.Option("argn.max", 50),
 		happy.Option("usage", "koios api credential_utxos [credentials...] // max 50"),
 	).
-		WithFalgs(varflag.BoolFunc("extended", false, "Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call", "e"))
+		WithFlags(varflag.BoolFunc("extended", false, "Controls whether or not certain optional fields supported by a given endpoint are populated as a part of the call", "e"))
 
 	cmd.AddInfo("Get UTxO details for requested payment credentials")
 

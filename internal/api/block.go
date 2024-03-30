@@ -24,7 +24,7 @@ func cmdBlockBlocks(c *client) *happy.Command {
 	cmd := happy.NewCommand("blocks",
 		happy.Option("description", "Block List"),
 		happy.Option("category", categoryBlock),
-	).WithFalgs(pagingFlags...)
+	).WithFlags(pagingFlags...)
 
 	cmd.AddInfo("Get summarised details about all blocks (paginated - latest first)")
 	cmd.AddInfo("Docs: https://api.koios.rest/#get-/blocks")
@@ -49,7 +49,7 @@ func cmdBlockBlockInfo(c *client) *happy.Command {
 		happy.Option("category", categoryBlock),
 		happy.Option("argn.min", 1),
 		happy.Option("argn.max", 50),
-	).WithFalgs(pagingFlags...)
+	).WithFlags(pagingFlags...)
 
 	cmd.AddInfo("Get detailed information about a blocks")
 	cmd.AddInfo(`
@@ -85,7 +85,7 @@ func cmdBlockBlockTxs(c *client) *happy.Command {
 		happy.Option("category", categoryBlock),
 		happy.Option("argn.min", 1),
 		happy.Option("argn.max", 50),
-	).WithFalgs(pagingFlags...)
+	).WithFlags(pagingFlags...)
 
 	cmd.AddInfo("Get a list of all transactions included in a provided block")
 	cmd.AddInfo(`
