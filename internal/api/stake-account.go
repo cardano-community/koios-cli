@@ -261,7 +261,42 @@ func cmdStakeAccountAccountRewards(c *client) *happy.Command {
 }
 
 func cmdStakeAccountAccountUpdates(c *client) *happy.Command {
-	return notimplCmd(categoryStakeAccount, "account_updates")
+	cmd := happy.NewCommand("account_updates",
+		happy.Option("description", "Account Updates"),
+		happy.Option("category", categoryStakeAccount),
+		happy.Option("argn.min", 1),
+		happy.Option("argn.max", 50),
+		happy.Option("usage", "koios api account_updates [_stake_addresses...] // max 50"),
+	).WithFlags(pagingFlags...)
+
+	cmd.AddInfo("Get the account updates (registration, deregistration, delegation and withdrawals) for given stake addresses")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/account_updates
+
+    Example: koios-cli api account_updates \
+      stake1uyrx65wjqjgeeksd8hptmcgl5jfyrqkfq0xe8xlp367kphsckq250 \
+      stake1uxpdrerp9wrxunfh6ukyv5267j70fzxgw0fr3z8zeac5vyqhf9jhy
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		var addresses []koios.Address
+
+		for _, arg := range args.Args() {
+			addresses = append(addresses, koios.Address(arg.String()))
+		}
+
+		res, err := c.koios().GetAccountUpdates(sess, addresses, opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdStakeAccountAccountAddresses(c *client) *happy.Command {
