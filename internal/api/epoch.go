@@ -65,7 +65,38 @@ func cmdEpochInfo(c *client) *happy.Command {
 }
 
 func cmdEpochParams(c *client) *happy.Command {
-	return notimplCmd(categoryEpoch, "epoch_params")
+	cmd := happy.NewCommand("epoch_params",
+		happy.Option("description", "Epoch Parameters"),
+		happy.Option("category", categoryEpoch),
+		happy.Option("argn.min", 0),
+		happy.Option("argn.max", 1),
+	).WithFalgs(
+		pagingFlags...,
+	)
+
+	cmd.AddInfo("Get the protocol parameters for specific epoch, returns information about all epochs if no epoch specified")
+
+	cmd.AddInfo(`
+    Docs: https://api.koios.rest/#get-/epoch_params
+
+    Example: koios-cli api epoch_params
+    Example: koios-cli api epoch_params 320
+  `)
+
+	cmd.Do(func(sess *happy.Session, args happy.Args) error {
+		opts, err := c.newRequestOpts(sess, args)
+		if err != nil {
+			return err
+		}
+
+		// 0  when value is invalid
+		epochNo, _ := args.Arg(0).Uint()
+		res, err := c.koios().GetEpochParams(sess, koios.EpochNo(epochNo), opts)
+		apiOutput(c.noFormat, res, err)
+		return err
+	})
+
+	return cmd
 }
 
 func cmdEpochBlockProtocols(c *client) *happy.Command {
