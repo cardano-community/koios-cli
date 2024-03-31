@@ -7,16 +7,13 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io/fs"
 	"log/slog"
 	"net/url"
-	"os"
-	"path/filepath"
 	"sync"
 	"time"
 
+	"github.com/cardano-community/koios-cli/v2/internal/auth"
 	"github.com/cardano-community/koios-go-client/v4"
 	"github.com/happy-sdk/happy"
 	"github.com/happy-sdk/happy/pkg/vars/varflag"
@@ -39,9 +36,10 @@ var (
 )
 
 type client struct {
-	mu       sync.Mutex
-	kc       *koios.Client
-	noFormat bool
+	mu           sync.Mutex
+	kc           *koios.Client
+	noFormat     bool
+	subscription *auth.Subscription
 }
 
 func Command() *happy.Command {
@@ -138,19 +136,13 @@ func (c *client) configure(sess *happy.Session, args happy.Args) (err error) {
 		if err := c.kc.SetAuth(args.Flag("auth").String()); err != nil {
 			return fmt.Errorf("failed to set auth token: %w", err)
 		}
-	}
-
-	if args.Flag("profile").Present() {
-		koiosAuthFile := filepath.Join(sess.Get("app.fs.path.config").String(), "koios-auth.jwt")
-		if _, err := os.Stat(koiosAuthFile); errors.Is(err, fs.ErrNotExist) {
-			return fmt.Errorf("auth token file not found: %w", err)
-		}
-
-		tokenfile, err := os.ReadFile(koiosAuthFile)
+	} else if args.Flag("profile").Present() {
+		subscription, err := auth.LoadSubscription(sess)
 		if err != nil {
-			return fmt.Errorf("failed to read auth token file: %w", err)
+			return err
 		}
-		return c.kc.SetAuth(string(tokenfile))
+		c.subscription = subscription
+		return c.kc.SetAuth(subscription.JWT)
 	}
 
 	return
@@ -180,6 +172,14 @@ func (c *client) newRequestOpts(sess *happy.Session, args happy.Args) (*koios.Re
 			return nil, fmt.Errorf("failed to parse query parameters: %w", err)
 		}
 		opts.QueryApply(q)
+	}
+
+	if c.subscription != nil {
+		c.subscription.RequestsToday++
+		opts.SetRequestsToday(c.subscription.RequestsToday)
+		if err := c.subscription.Save(); err != nil {
+			return nil, fmt.Errorf("failed to save subscription: %w", err)
+		}
 	}
 
 	// opts.SetPageSize(args.Flag("page-size").Var().Uint())
@@ -218,6 +218,11 @@ func getHost(args happy.Args) (string, error) {
 
 // output koios api client responses.
 func apiOutput(noFormat bool, data any, err error) {
+	if err != nil {
+		handleErr(noFormat, err)
+		return
+	}
+
 	buffer := &bytes.Buffer{}
 	encoder := json.NewEncoder(buffer)
 	encoder.SetEscapeHTML(false)

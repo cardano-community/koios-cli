@@ -18,9 +18,13 @@ func main() {
 	logOpts.AddSource = false
 
 	app := happy.New(happy.Settings{
-		Name:           "KOIOS CLI",
-		Slug:           "koios",
-		Description:    "Koios is a distributed & open-source public API query layer for Cardano, that is elastic in nature and addresses ever-demanding requirements from Cardano Blockchain. It provides a easy to query RESTful layer that has a lot of flexibility to cater for different data consumption requirements from blockchain.",
+		Name: "KOIOS CLI",
+		Slug: "koios",
+		Description: `
+      Koios is a distributed & open-source public API query layer for Cardano,
+      that is elastic in nature and addresses ever-demanding requirements from Cardano Blockchain.
+      It provides a easy to query RESTful layer that has a lot of flexibility to cater for
+      different data consumption requirements from blockchain.`,
 		CopyrightBy:    "The Cardano Community",
 		CopyrightSince: 2022,
 		License:        "Apache-2.0",
@@ -31,6 +35,20 @@ func main() {
 		WithBrand(koios.Brand()).
 		WithCommand(api.Command()).
 		WithCommand(auth.Command())
+
+	app.AddInfo(`
+      Example: Usage with Public Tier
+        koios-cli api tip
+
+      Example: Usage with subscription token without saving token to disk
+        koios-cli api --auth <jwt-token> tip
+
+      Example: Usage with saved profile (see koios-cli auth -h)
+        koios-cli --profile <project-id> api tip
+
+      Example: Usage with saved profile and stats
+        koios-cli --profile <project-id> api --stats tip
+    `)
 
 	app.Run()
 }
