@@ -1,7 +1,7 @@
 github.com/cardano-community/koios-go-client/v4 v4.0.0-20240331103243-809415b26acb h1:+rvCyQh5kMjVkfNZ67Y8uwXm2jkWnRY24H+Ce+vKRks=
 github.com/cardano-community/koios-go-client/v4 v4.0.0-20240331103243-809415b26acb/go.mod h1:8idJ713OMKR1eseV0beKa6DuifrF2cHvpet1KOnsI1Q=
-github.com/happy-sdk/happy v0.23.0 h1:p2veMovA7YHYKgl3fsRaEYOG4YO1OrbHwTZAOYc3JWs=
-github.com/happy-sdk/happy v0.23.0/go.mod h1:OjnEjUhw5mmRKDoMHRsi2JkukNWsABeM+4G87CbgtH0=
+github.com/happy-sdk/happy v0.23.1 h1:e/qEUfdqtkBUp6uylEnCLQ7KIvXQzjx2zzXHploYeek=
+github.com/happy-sdk/happy v0.23.1/go.mod h1:OjnEjUhw5mmRKDoMHRsi2JkukNWsABeM+4G87CbgtH0=
 github.com/happy-sdk/happy/pkg/branding v0.1.0 h1:qdsxMe2D1oouzo7Jsx054V/A1HTq1RmsvEQuzFtA0L8=
 github.com/happy-sdk/happy/pkg/branding v0.1.0/go.mod h1:2LFkUQwOgwe9jKLQVfLqYaPbCJgTHqbfbjznq6IzbNs=
 github.com/happy-sdk/happy/pkg/cli/ansicolor v0.2.0 h1:jAP1rK2y+eeFgAQIJVqfY8AWS4IHw+4KW0HhDM3cRT8=

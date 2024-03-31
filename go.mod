@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/cardano-community/koios-go-client/v4 v4.0.0-20240331103243-809415b26acb
-	github.com/happy-sdk/happy v0.23.0
+	github.com/happy-sdk/happy v0.23.1
 	github.com/happy-sdk/happy/pkg/branding v0.1.0
 	github.com/happy-sdk/happy/pkg/cli/ansicolor v0.2.0
 	github.com/happy-sdk/happy/pkg/strings/textfmt v0.3.1
