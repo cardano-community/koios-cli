@@ -1,7 +1,7 @@
-github.com/cardano-community/koios-go-client/v4 v4.0.0-20240330222752-c1a9f65269d4 h1:nt4sychBGCcsZeMR40tp3waGiJAsVrG63x4++jn2Lno=
-github.com/cardano-community/koios-go-client/v4 v4.0.0-20240330222752-c1a9f65269d4/go.mod h1:Gg9C6v2t5/20E7uTyRDiX4bEc3PufUCzU3ydUO6xv7E=
-github.com/happy-sdk/happy v0.22.0 h1:cOqwDa4IguMbkecGQEb+ML3A1GlYh6Q3j5v5GQ/gqes=
-github.com/happy-sdk/happy v0.22.0/go.mod h1:gi7yeb7h0h6uXRT9DSLt5zVYvm3+m7HpVMlokLr3OUc=
+github.com/cardano-community/koios-go-client/v4 v4.0.0-20240331103243-809415b26acb h1:+rvCyQh5kMjVkfNZ67Y8uwXm2jkWnRY24H+Ce+vKRks=
+github.com/cardano-community/koios-go-client/v4 v4.0.0-20240331103243-809415b26acb/go.mod h1:8idJ713OMKR1eseV0beKa6DuifrF2cHvpet1KOnsI1Q=
+github.com/happy-sdk/happy v0.23.0 h1:p2veMovA7YHYKgl3fsRaEYOG4YO1OrbHwTZAOYc3JWs=
+github.com/happy-sdk/happy v0.23.0/go.mod h1:OjnEjUhw5mmRKDoMHRsi2JkukNWsABeM+4G87CbgtH0=
 github.com/happy-sdk/happy/pkg/branding v0.1.0 h1:qdsxMe2D1oouzo7Jsx054V/A1HTq1RmsvEQuzFtA0L8=
 github.com/happy-sdk/happy/pkg/branding v0.1.0/go.mod h1:2LFkUQwOgwe9jKLQVfLqYaPbCJgTHqbfbjznq6IzbNs=
 github.com/happy-sdk/happy/pkg/cli/ansicolor v0.2.0 h1:jAP1rK2y+eeFgAQIJVqfY8AWS4IHw+4KW0HhDM3cRT8=
@@ -16,8 +16,8 @@ github.com/happy-sdk/happy/pkg/strings/bexp v1.4.0 h1:J03LsUsON3MKpzABBk38Oiaz4t
 github.com/happy-sdk/happy/pkg/strings/bexp v1.4.0/go.mod h1:Rh/N0HD/+4opgD1Sby7pXb+zHoWbGgJVQ2frGxUVYY0=
 github.com/happy-sdk/happy/pkg/strings/humanize v0.2.0 h1:JnuVetOXNojQPdy8cAeHGQEcl+nGkeXSS1ATDvyy3WA=
 github.com/happy-sdk/happy/pkg/strings/humanize v0.2.0/go.mod h1:Dp6qnkbB06h37NYewyH0wzLJYFGFzel//NIUuVuddyQ=
-github.com/happy-sdk/happy/pkg/strings/textfmt v0.3.0 h1:Pd30ga+VtYeBpEU1U6lMqHrF9pP7dG6M1gOQS7VlhhQ=
-github.com/happy-sdk/happy/pkg/strings/textfmt v0.3.0/go.mod h1:kaz61MKCgaIj1NtWrA9wm5RlvnztCY3x2BAfGGUg82o=
+github.com/happy-sdk/happy/pkg/strings/textfmt v0.3.1 h1:QmJhnPWNLYKiWM894YPSB0tMzCZl5HofY/FNp1O7ugg=
+github.com/happy-sdk/happy/pkg/strings/textfmt v0.3.1/go.mod h1:kaz61MKCgaIj1NtWrA9wm5RlvnztCY3x2BAfGGUg82o=
 github.com/happy-sdk/happy/pkg/vars v0.10.0 h1:YXg+dXmOB+MGvVAMt8gz/xvzgr5WxGazIEWa2Ryu6ig=
 github.com/happy-sdk/happy/pkg/vars v0.10.0/go.mod h1:sDPlycMrTvyLHcUzFc+jx57JEmORoic0gfO1wRWRY0o=
 github.com/happy-sdk/happy/pkg/version v0.1.2 h1:8DJ0afkEVW2fdm1uEScTS4wPgGe0Tmls3QPuX7jrbhY=
