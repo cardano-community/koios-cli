@@ -98,7 +98,12 @@ func cmdAuthAdd() *happy.Command {
 		infotbl.AddRow("CORS Restricted", fmt.Sprint(authInfo.CORSRestricted))
 		fmt.Println(infotbl.String())
 
-		configRootDir := filepath.Dir(sess.Get("app.fs.path.config").String())
+		var configRootDir string
+		if sess.Get("app.profile.name").String() == "public" {
+			configRootDir = filepath.Join(sess.Get("app.fs.path.config").String(), "profiles")
+		} else {
+			configRootDir = filepath.Dir(sess.Get("app.fs.path.config").String())
+		}
 
 		profileName := authInfo.ProjID
 		if sess.Get("app.devel").Bool() {
