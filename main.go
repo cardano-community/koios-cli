@@ -28,8 +28,8 @@ func main() {
 		CopyrightBy:    "The Cardano Community",
 		CopyrightSince: 2022,
 		License:        "Apache-2.0",
-		TimeLocation:   "Local",
-		StatsEnabled:   false,
+		// TimeLocation:   "Local",
+		// StatsEnabled:   false,
 	}).
 		WithLogger(logging.Console(logOpts)).
 		WithBrand(koios.Brand()).
