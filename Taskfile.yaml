@@ -40,8 +40,8 @@ tasks:
   # https://github.com/caarlos0/svu
   release:tag:
     vars:
-      NEXT:
-        sh: svu n
+      NEXT: v2.0.0-alpha.4
+        # sh: svu n
     desc: create new tag
     preconditions:
       - sh: git diff-index --quiet HEAD

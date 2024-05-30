@@ -1,17 +1,25 @@
-module github.com/cardano-community/koios-cli
+module github.com/cardano-community/koios-cli/v2
 
-go 1.18
+go 1.22
 
 require (
-	github.com/cardano-community/koios-go-client/v3 v3.1.3
-	github.com/urfave/cli/v2 v2.27.1
+	github.com/cardano-community/koios-go-client/v4 v4.0.0-20240331103243-809415b26acb
+	github.com/happy-sdk/happy v0.23.1
+	github.com/happy-sdk/happy/pkg/branding v0.1.0
+	github.com/happy-sdk/happy/pkg/cli/ansicolor v0.2.0
+	github.com/happy-sdk/happy/pkg/strings/textfmt v0.3.1
+	github.com/happy-sdk/happy/pkg/vars v0.10.0
 )
 
 require (
-	github.com/cpuguy83/go-md2man/v2 v2.0.3 // indirect
-	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/happy-sdk/happy/pkg/scheduling/cron v0.4.1 // indirect
+	github.com/happy-sdk/happy/pkg/settings v0.1.1 // indirect
+	github.com/happy-sdk/happy/pkg/strings/bexp v1.4.0 // indirect
+	github.com/happy-sdk/happy/pkg/strings/humanize v0.2.0 // indirect
+	github.com/happy-sdk/happy/pkg/version v0.1.2 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
-	github.com/xrash/smetrics v0.0.0-20231213231151-1d8dd44e695e // indirect
+	golang.org/x/mod v0.16.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 )
