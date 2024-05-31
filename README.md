@@ -172,7 +172,7 @@
   --host-preview      Use preview network host - default: "false"
   --no-format         prints response as machine readable json string - default: "false"
   --origin            Set origin for the API server - default:
-                      "https://github.com/cardano-community/koios-cli"
+                      "https://github.com/cardano-community/koios-cli/v2"
   --port              Set port number for the API server - default: "443"
   --rate-limit        Set rate limit for the API server - default: "10"
   --scheme            Set scheme for the API server - default: "https"
@@ -290,7 +290,7 @@ It's highly recommended installing a latest version of `koios-cli` available on 
 ## Install from Source
 
 ```shell
-go install github.com/cardano-community/koios-cli@latest
+go install github.com/cardano-community/koios-cli/v2@latest
 ```
 
 **verify installation**
