@@ -55,105 +55,140 @@
   <summary><code>koios-cli api --help</code></summary>
 
 ```
-NAME:
-   koios-cli - Koios CLI Client
+  KOIOS CLI - v2.0.0
+  Copyright © 2022 - 2024 The Cardano Community
+  License: Apache-2.0
+  
+  Interact with Koios API REST endpoints
 
-USAGE:
-   koios-cli [global options] command [command options] [arguments...]
+  koios api [flags] [subcommand]
 
-VERSION:
-   (devel)
+ COMMANDS:
 
-AUTHOR:
-   The Cardano Community Authors
+  ADDRESS - Query information about specific address(es)
 
-COMMANDS:
-   help, h  Shows a list of commands or help for one command
-   KOIOS REST API:
-     api  Interact with Koios API REST endpoints
+  address_assets             Address Assets
+  address_info               Address Information
+  address_txs                Address Transactions
+  address_utxos              Address UTxOs
+  credential_txs             Transactions from payment credentials
+  credential_utxos           UTxOs from payment credentials
 
-GLOBAL OPTIONS:
-   --help, -h     show help (default: false)
-   --version, -v  print the version (default: false)
+  ASSET - Query Asset related informations
 
-COPYRIGHT:
-   (c) 2022 The Cardano Community
-[mkungla@howi-main koios-cli]$ go run . api -h
-NAME:
-   koios-cli api - Interact with Koios API REST endpoints
+  asset_addresses            Asset Addresses
+  asset_history              Asset History
+  asset_info                 Asset Information (Bulk)
+  asset_list                 Asset List
+  asset_nft_address          Asset NFT Address
+  asset_summary              Asset Summary
+  asset_token_registry       Asset Token Registry
+  asset_txs                  Asset Transactions
+  asset_utxos                Asset UTXOs
+  policy_asset_addresses     Policy Asset Address List
+  policy_asset_info          Policy Asset Information
+  policy_asset_list          Policy Asset List
+  policy_asset_mints         Policy Asset Mints
 
-USAGE:
-   koios-cli api command [command options] [arguments...]
+  BLOCK - Query information about particular block on chain
 
-COMMANDS:
-   tip                      Get the tip info about the latest block seen by chain.
-   genesis                  Get the Genesis parameters used to start specific era on chain.
-   totals                   Get the circulating utxo, treasury rewards, supply and reserves in lovelace for specified epoch, all epochs if empty.
-   epoch-info               Get the epoch information, all epochs if no epoch specified.
-   epoch-params             Get the protocol parameters for specific epoch, returns information about all epochs if no epoch specified.
-   epoch-block-protocols    Get the information about block protocol distribution in epoch
-   blocks                   Get summarised details about all blocks (paginated - latest first).
-   blocks-info              Get detailed information about a blocks.
-   block-info               Get detailed information about a specific block.
-   block-txs                Get a list of all transactions included in a provided block.
-   txs-info                 Get detailed information about transaction(s).
-   tx-info                  Get detailed information about single transaction.
-   tx-utxos                 Get UTxO set (inputs/apiOutputs) of transactions.
-   txs-metadata             Get metadata information (if any) for given transaction(s).
-   tx-metadata              Get metadata information (if any) for given transaction.
-   tx-metalabels            Get a list of all transaction metalabels.
-   tx-submit                Submit signed transaction to the network.
-   txs-statuses             Get the number of block confirmations for a given transaction hash list
-   tx-status                Get the number of block confirmations for a given transaction hash
-   address-info             Get address info - balance, associated stake address (if any) and UTxO set.
-   address-txs              Get the transaction hash list of input address array, optionally filtering after specified block height (inclusive).
-   address-assets           Get the list of all the assets (policy, name and quantity) for a given address.
-   credential-txs           Get the transaction hash list of input payment credentials, optionally filtering after specified block height (inclusive).
-   account-list             Get a list of all accounts returns array of stake addresses.
-   account-info             Get the account info of any (payment or staking) address.
-   account-rewards          Get the full rewards history (including MIR) for a stake address, or certain epoch if specified.
-   account-updates          Get the account updates (registration, deregistration, delegation and withdrawals).
-   account-addresses        Get all addresses associated with an account payment or staking address
-   account-assets           Get the native asset balance of an account.
-   account-history          Get the staking history of an account.
-   asset-list               Get the list of all native assets (paginated).
-   asset-address-list       Get the list of all addresses holding a given asset.
-   asset-info               Get the information of an asset including first minting & token registry metadata.
-   asset-summary            Get the summary of an asset (total transactions exclude minting/total wallets include only wallets with asset balance).
-   asset-history            Get the mint/burn history of an asset.
-   asset-txs                Get the list of all asset transaction hashes (newest first).
-   asset-policy-info        Get the information for all assets under the same policy.
-   pool-list                A list of all currently registered/retiring (not retired) pools.
-   pool-infos               Current pool statuses and details for a specified list of pool ids.
-   pool-info                Current pool status and details for a specified pool by pool id.
-   pool-delegators          Return information about delegators by a given pool and optional epoch (current if omitted).
-   pool-history             Return information about delegators by a given pool and optional epoch (current if omitted).
-   pool-blocks              Return information about blocks minted by a given pool in current epoch (or _epoch_no if provided).
-   pool-updates             Return all pool updates for all pools or only updates for specific pool if specified.
-   pool-relays              A list of registered relays for all currently registered/retiring (not retired) pools.
-   pool-metadata            Metadata(on & off-chain) for all currently registered/retiring (not retired) pools.
-   pool-delegators-history  Return information about active delegators (incl. history) for a given pool and epoch number - current epoch if not provided.
-   pool-stake-snapshot      Returns Mark, Set and Go stake snapshots for the selected pool, useful for leaderlog calculation.
-   native-script-list       List of all existing native script hashes along with their creation transaction hashes.
-   plutus-script-list       List of all existing Plutus script hashes along with their creation transaction hashes.
-   script-redeemers         List of all redeemers for a given script hash.
-   help, h                  Shows a list of commands or help for one command
+  block-info                 Block Info
+  block-txs                  Block Txs
+  blocks                     Block List
 
-OPTIONS:
-   --port value         Set port (default: 443)
-   --host value         Set host (default: "api.koios.rest")
-   --api-version value  Set API version (default: "v0")
-   --scheme value       Set URL scheme (default: "https")
-   --origin value       Set Origin header for requests. (default: "https://github.com/cardano-community/koios-go-client")
-   --rate-limit value   Set API Client rate limit for outgoing requests (default: 10)
-   --no-format          prints response json strings directly without calling json pretty. (default: false)
-   --enable-req-stats   Enable request stats. (default: false)
-   --preview            use preview host. (default: false)
-   --preprod            use preprod host. (default: false)
-   --guildnet           use guildnet host. (default: false)
-   --page value         Set current page for request (default: 1)
-   --page-size value    Set page size for request (default: 1000)
-   --help, -h           show help (default: false)
+  EPOCH - Query epoch-specific details
+
+  epoch_block_protocols      Epoch Block Protocols
+  epoch_info                 Epoch Information
+  epoch_params               Epoch Parameters
+
+  NETWORK - Query information about the network
+
+  genesis                    Get Genesis info
+  param_updates              Param Update Proposals
+  reserve_withdrawals        Reserve Withdrawals
+  tip                        Query Chain Tip
+  totals                     Get historical tokenomic stats
+  treasury_withdrawals       Treasury Withdrawals
+
+  OGMIOS - Various stateless queries against Ogmios v6 instance
+
+  ogmios                     NOT IMPLEMENTED
+
+  POOL - Query information about specific pools
+
+  pool_blocks                Pool Blocks
+  pool_delegators            Pool Delegators
+  pool_delegators_history    Pool Delegators History
+  pool_history               Pool History
+  pool_info                  Pool Information
+  pool_list                  Pool List
+  pool_metadata              Pool Metadata
+  pool_registrations         Pool Registrations
+  pool_relays                Pool Relays
+  pool_retirements           Pool Retirements
+  pool_stake_snapshot        Pool Stake Snapshot
+  pool_updates               Pool Updates (History)
+
+  SCRIPT - Query information about specific scripts (Smart Contracts)
+
+  datum_info                 Datum Information
+  native_script_list         Native Script List
+  plutus_script_list         Plutus Script List
+  script_info                Script Information
+  script_redeemers           Script Redeemers
+  script_utxos               Script Utxos
+
+  STAKE ACCOUNT - Query details about specific stake account addresses
+
+  account_addresses          Account Addresses
+  account_assets             Account Assets
+  account_history            Account History
+  account_info               Account Information
+  account_info_cached        Account Information Cached
+  account_list               Account List
+  account_rewards            Account Rewards
+  account_txs                Account Transactions
+  account_updates            Account Updates
+  account_utxos              Account Utxos
+
+  TRANSACTIONS - Query blockchain transaction details
+
+  submittx                   NOT IMPLEMENTED
+  tx_info                    Transaction Information
+  tx_metadata                Transaction Metadata
+  tx_metalabels              Transaction Metadata Labels
+  tx_status                  Transaction Status
+  utxo_info                  UTxO Info
+
+ FLAGS:
+
+  --api-version       Set API version - default: "v1"
+  --auth              JWT Bearer Auth token generated via https://koios.rest Profile page.
+  --host              Set host for the API server - default: "api.koios.rest"
+  --host-eu           Use eu mainet network host - default: "false"
+  --host-guildnet     Use guildnet network host - default: "false"
+  --host-preprod      Use preprod network host - default: "false"
+  --host-preview      Use preview network host - default: "false"
+  --no-format         prints response as machine readable json string - default: "false"
+  --origin            Set origin for the API server - default:
+                      "https://github.com/cardano-community/koios-cli"
+  --port              Set port number for the API server - default: "443"
+  --rate-limit        Set rate limit for the API server - default: "10"
+  --scheme            Set scheme for the API server - default: "https"
+  --stats             Enable request stats - default: "false"
+  --timeout           Set timeout for the API server - default: "1m0s"
+
+ GLOBAL FLAGS:
+
+  --debug              enable debug log level. when debug flag is after the command then debug level
+                       will be enabled only for that command - default: "false"
+  --help         -h    display help or help for the command. [...command --help] - default: "false"
+  --profile            session profile to be used - default: "public"
+  --system-debug       enable system debug log level (very verbose) - default: "false"
+  --verbose      -v    enable verbose log level - default: "false"
+  --version            print application version - default: "false"
+  -x                   the -x flag prints all the cli commands as they are executed. - default: "false"
 ```
 
 </details>
@@ -161,73 +196,89 @@ OPTIONS:
 ### Example Usage
 
 ```shell
-koios-cli api --enable-req-stats tip
+koios-cli api --stats tip
 ```
 
 **response**
 
 ```json
 {
-  "request_url": "https://api.koios.rest/api/v0/tip",
+  "request_url": "https://api.koios.rest/api/v1/tip",
   "request_method": "GET",
   "status_code": 200,
   "status": "200 OK",
-  "date": "Mon, 07 Feb 2022 12:49:49 GMT",
+  "date": "Fri, 31 May 2024 08:06:48 GMT",
   "content_range": "0-0/*",
   "stats": {
-    "req_started_at": "2022-02-07T12:49:48.565834833Z",
-    "req_dns_lookup_dur": 1284269, // dns lookup duration in nanosecons.
-    "tls_hs_dur": 208809082, // handshake duration in nanosecons.
-    "est_cxn_dur": 159857626, // time it took to establish connection with server in nanosecons.
-    "ttfb": 998874037, // time since start of the request it took to recieve first byte.
-    "req_dur": 999186595, // total request duration in nanoseconds
-    "req_dur_str": "999.186595ms" // string of req_dur
+    "req_started_at": "2024-05-31T08:06:48.846603938Z",
+    "req_dns_lookup_dur": 78489018,
+    "tls_hs_dur": 109035482,
+    "est_cxn_dur": 62920181,
+    "ttfb": 636448677,
+    "req_dur": 636774353,
+    "req_dur_str": "636.774353ms",
+    "auth": {
+      "tier": "public",
+      "expires": "No expiration date",
+      "max_requests": 5000,
+      "max_rps": 10,
+      "query_timeout": "30s",
+      "cors_restricted": true
+    }
   },
   "data": {
-    "abs_slot": 52671876,
-    "block_no": 6852764,
-    "block_time": "2022-02-07T12:49:27",
-    "epoch": 319,
-    "epoch_slot": 227076,
-    "hash": "1dad134750188460dd48068e655b5935403d2f51afaf53a39337a4c89771754a"
+    "abs_slot": 125576504,
+    "block_no": 10385051,
+    "block_time": 1717142795,
+    "epoch_no": 488,
+    "epoch_slot": 123704,
+    "hash": "1dd29324ce46038be9afb9011348530e6ff2e57ad0f818dcbe12bbf498abd157"
   }
-
+}
 ```
 
 #### Example to query testnet tip from cli
 
 ```shell
-koios-cli api --enable-req-stats --testnet tip
+koios-cli api --stats --host-preprod tip
 # OR
-koios-cli api --enable-req-stats --host testnet.koios.rest tip
+koios-cli api --stats --host preprod.koios.rest tip
 ```
 
 **response**
 
 ```json
 {
-  "request_url": "https://testnet.koios.rest/api/v0/tip",
+  "request_url": "https://preprod.koios.rest/api/v1/tip",
   "request_method": "GET",
   "status_code": 200,
   "status": "200 OK",
-  "date": "Mon, 07 Feb 2022 12:50:04 GMT",
+  "date": "Fri, 31 May 2024 08:09:31 GMT",
   "content_range": "0-0/*",
   "stats": {
-    "req_started_at": "2022-02-07T12:50:03.98615637Z",
-    "req_dns_lookup_dur": 1383437,
-    "tls_hs_dur": 69093093,
-    "est_cxn_dur": 43733700,
-    "ttfb": 167423049,
-    "req_dur": 167738287,
-    "req_dur_str": "167.738287ms"
+    "req_started_at": "2024-05-31T08:09:30.905348607Z",
+    "req_dns_lookup_dur": 1873265,
+    "tls_hs_dur": 63867504,
+    "est_cxn_dur": 28092739,
+    "ttfb": 159446743,
+    "req_dur": 159811589,
+    "req_dur_str": "159.811589ms",
+    "auth": {
+      "tier": "public",
+      "expires": "No expiration date",
+      "max_requests": 5000,
+      "max_rps": 10,
+      "query_timeout": "30s",
+      "cors_restricted": true
+    }
   },
   "data": {
-    "abs_slot": 49868948,
-    "block_no": 3300758,
-    "block_time": "2022-02-07T12:49:24",
-    "epoch": 185,
-    "epoch_slot": 318548,
-    "hash": "d7623e68cb78f450f42ba4b5a169124b26677f08f676ca4241b27edb6dbf0071"
+    "abs_slot": 61459716,
+    "block_no": 2304547,
+    "block_time": 1717142916,
+    "epoch_no": 146,
+    "epoch_slot": 29316,
+    "hash": "1f5df7af623cfc29539ee48a3cfd5ac9c93a5b85fd84066566c762a968d0f04c"
   }
 }
 ```
