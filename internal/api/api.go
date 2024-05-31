@@ -13,13 +13,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cardano-community/koios-cli/v2/internal/auth"
+	"github.com/cardano-community/koios-cli/internal/auth"
 	"github.com/cardano-community/koios-go-client/v4"
 	"github.com/happy-sdk/happy"
 	"github.com/happy-sdk/happy/pkg/vars/varflag"
 )
 
-const defaultOrigin = "https://github.com/cardano-community/koios-cli/v2"
+const defaultOrigin = "https://github.com/cardano-community/koios-cli"
 
 var (
 	pagingFlags = []varflag.FlagCreateFunc{
