@@ -1,4 +1,4 @@
-module github.com/cardano-community/koios-cli
+module github.com/cardano-community/koios-cli/v2
 
 go 1.22
 

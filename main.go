@@ -5,9 +5,9 @@
 package main
 
 import (
-	"github.com/cardano-community/koios-cli/internal/api"
-	"github.com/cardano-community/koios-cli/internal/auth"
-	"github.com/cardano-community/koios-cli/koios"
+	"github.com/cardano-community/koios-cli/v2/internal/api"
+	"github.com/cardano-community/koios-cli/v2/internal/auth"
+	"github.com/cardano-community/koios-cli/v2/koios"
 	"github.com/happy-sdk/happy"
 	"github.com/happy-sdk/happy/sdk/logging"
 )
